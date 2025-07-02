@@ -58,10 +58,11 @@ RUN pip3 install --upgrade pip && \
 WORKDIR /opt
 RUN wget https://github.com/kundajelab/idr/archive/refs/tags/2.0.4.2.tar.gz && \
     tar -xvf 2.0.4.2.tar.gz && \
-    cd idr-2.0.4.2/idr && \
-    sed -i 's/numpy.int/int/g' idr.py && \
-    pip install . --break-system-packages && \
-    cd /opt && \
+    # Fix deprecated numpy type in the IDR script
+    sed -i 's/numpy.int/int/g' idr-2.0.4.2/idr/idr.py && \
+    # Install the package from its root (where setup.py lives)
+    pip install ./idr-2.0.4.2 --break-system-packages && \
+    # Clean up build files to keep the image lean
     rm -rf idr-2.0.4.2 2.0.4.2.tar.gz
 
 
