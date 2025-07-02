@@ -23,11 +23,10 @@ RUN apt-get update && apt-get install -y \
     python3 \
     python3-dev \
     python3-pip \
-    cython \
+    cython3 \
     r-base \
     bedtools \
     samtools \
-    yq \
     bc \
     parallel \
     unzip \
@@ -48,6 +47,7 @@ ENV LANG=en_US.UTF-8 \
 # === Python packages ===
 RUN pip3 install --upgrade pip && \
     pip3 install deeptools==3.5.6 macs3 yq
+
 
 # === IDR patched installation (numpy compatibility fix) ===
 WORKDIR /opt

@@ -57,9 +57,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 RUN wget -q https://ftp-trace.ncbi.nlm.nih.gov/sra/sdk/current/sratoolkit.current-ubuntu64.tar.gz && \
     tar -xzf sratoolkit.current-ubuntu64.tar.gz && \
-    mv sratoolkit.* /opt/sratoolkit && \
+    SRADIR=$(find . -maxdepth 1 -type d -name "sratoolkit.*" | head -n1) && \
+    mv "$SRADIR" /opt/sratoolkit && \
     ln -s /opt/sratoolkit/bin/* /usr/local/bin/ && \
     rm sratoolkit.current-ubuntu64.tar.gz
+
+
 
 # ------------------------------------------------------------------------------
 # Install R packages
@@ -79,8 +82,10 @@ WORKDIR /pipeline
 # Copy pipeline files (adjust context path if needed)
 # ------------------------------------------------------------------------------
 
+# Copy pipeline files (adjust context path if needed)
 COPY . /pipeline
-COPY tools/ /opt/pipeline2/tools/
+COPY tools/ /pipeline/tools/
+
 
 # Ensure tools are executable
 RUN chmod +x /pipeline/tools/qualimap/qualimap \
