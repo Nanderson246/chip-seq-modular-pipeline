@@ -60,9 +60,10 @@ RUN wget https://github.com/kundajelab/idr/archive/refs/tags/2.0.4.2.tar.gz && \
     tar -xvf 2.0.4.2.tar.gz && \
     cd idr-2.0.4.2/idr && \
     sed -i 's/numpy.int/int/g' idr.py && \
-    cd .. && \
     pip install . --break-system-packages && \
-    rm -rf /opt/idr-2.0.4.2 /opt/2.0.4.2.tar.gz
+    cd /opt && \
+    rm -rf idr-2.0.4.2 2.0.4.2.tar.gz
+
 
 # === HOMER installation ===
 RUN mkdir -p /opt/homer && \
