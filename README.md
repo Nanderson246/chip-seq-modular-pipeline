@@ -35,3 +35,6 @@ Inspired by the ENCODE standard, it is aimed at advanced users who want flexibil
 bash run_pipeline1.sh
 bash run_pipeline2.sh --caller macs3 --genome hg38
 
+> 📘 **Looking for full documentation?**  
+> Visit the [Wiki](https://github.com/Nanderson246/chip-seq-modular-pipeline/wiki) for setup, usage, and module details.
+
