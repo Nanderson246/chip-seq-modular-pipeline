@@ -1,0 +1,10 @@
+Sample_ID	Cell_line	Condition	Replicate	Sample_Type	Instrument	Target	Spike_Type
+SRR28422169	C57BL/6J	R24K_WT	Rep2	ChIP	NovaSeq	GR	none
+SRR28422170	C57BL/6J	R24K_homo	Rep2	ChIP	NovaSeq	GR	none
+SRR28422171	C57BL/6J	R24K_WT	Rep3	ChIP	NovaSeq	GR	none
+SRR28422172	C57BL/6J	R24K_WT	Rep1	Input	NovaSeq	GR	none
+SRR28422173	C57BL/6J	R24K_WT	Rep1	ChIP	NovaSeq	GR	none
+SRR28422174	C57BL/6J	R24K_homo	Rep3	ChIP	NovaSeq	GR	none
+SRR28422175	C57BL/6J	R24K_homo	Rep1	Input	NovaSeq	GR	none
+SRR28422176	C57BL/6J	R24K_homo	Rep1	ChIP	NovaSeq	GR	none
+

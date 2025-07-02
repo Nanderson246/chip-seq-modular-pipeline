@@ -1,0 +1,58 @@
+description: >
+  Metadata table for BAM file renaming in ChIP-seq experiments.
+  Required fields: Sample_ID, Sample_Type, Condition, and Target.
+  Optional fields such as Replicate, Cell_line, and Instrument will be sanitized and added to filenames if present.
+  Note: The 'Replicate' field must not be labeled as 'Input' or left empty. Use proper labels such as 'Rep1', 'Rep2', etc.
+
+required_fields:
+  - Sample_ID
+  - Instrument
+  - Sample_Type
+  - Condition
+  - Replicate
+  - Target
+  
+optional_fields:
+  - Cell_line
+  - Spike_Type
+
+field_rules:
+  Sample_Type:
+    regex: "^Input$|^IP(_rep[0-9]+)?$|^ChIP$"
+  Replicate:
+    regex: "^[Rr]ep[0-9]+$"
+
+sample_type_rules:
+  ip_types:
+    - IP
+    - ChIP
+  control_types:
+    - Input
+    - IgG
+    - Mock
+
+notes: |
+  ============================================================
+  Sample_Type accepted entries:
+    - IP   : Immunoprecipitation experimental sample
+    - ChIP : ChIP-seq experimental sample
+    - Input: Control (sonicated DNA without IP)
+    - IgG  : Control (non-specific antibody control)
+    - Mock : Control (mock treated sample)
+
+  Rules:
+    - Target samples must have Sample_Type = "IP" or "ChIP"
+    - Control samples must have Sample_Type = "Input", "IgG", or "Mock"
+    - Target is now REQUIRED for all samples (including Input).
+    - If no control sample exists, peaks will still be called using only IP/ChIP.
+  ============================================================
+  Field Definitions:
+    - Sample_ID: Unique identifier from SRA or your naming system.
+    - Sample_Type: Defines whether a sample is 'Input', 'IP', 'ChIP', etc.
+    - Instrument: Machine used (e.g., NovaSeq 6000, HiSeq 3000).
+    - Target: Target protein, histone mark, or nucleic acid feature (e.g., G4, H3K27ac, 5hmC).
+    - Condition: Short biological condition (e.g., WT, BLMneg).
+    - Replicate: Biological replicate label, required for proper matching in downstream tools.
+        Must follow naming such as 'Rep1', 'rep2', etc.
+        Do not use 'Input' or leave blank — 'Input' is a Sample_Type, not a replicate.
+

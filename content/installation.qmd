@@ -1,0 +1,114 @@
+---
+title: "⚙️ Installation Guide"
+---
+
+## 📦 Installation Overview
+
+This guide explains how to set up the ChIP-seq Modular Analysis Pipeline using:
+
+- ✅ Git clone (recommended)
+- 📁 `.tar.gz` or `.zip` archive download
+- 🐳 Docker (see [Docker Guide](docker_guide.qmd))
+- 🧪 Conda environments (see [Conda Setup](Conda.qmd))
+
+---
+
+## 📂 Option 1: Clone from GitHub
+
+The most robust and update-safe method:
+
+```bash
+git clone https://github.com/your-username/your-repo.git
+cd your-repo
+````
+
+### ✅ Make Scripts Executable (already github executable commit, but in case)
+
+```bash
+chmod +x run_pipeline*.sh
+chmod +x modules/**/*.sh
+chmod +x modules/**/*.py
+chmod +x modules/**/*.R
+```
+
+---
+
+## 📦 Option 2: Download Archive
+
+### 🔸 If you downloaded the `.tar.gz` version:
+
+```bash
+tar -xzvf your-pipeline.tar.gz
+cd your-pipeline
+```
+
+Scripts remain executable — no `chmod` needed.
+
+### ⚠️ If you downloaded the `.zip` version:
+
+```bash
+unzip your-pipeline.zip
+cd your-pipeline
+```
+
+Then run:
+
+```bash
+chmod +x run_pipeline*.sh
+chmod +x modules/**/*.sh
+chmod +x modules/**/*.py
+chmod +x modules/**/*.R
+```
+
+---
+
+## ✅ Test the Installation
+
+Make sure the scripts work:
+
+```bash
+./run_pipeline1.sh --help
+./run_pipeline2.sh --help
+```
+
+---
+
+## 📁 Expected File Structure
+
+```bash
+your-repo/
+├── run_pipeline1.sh
+├── run_pipeline2.sh
+├── modules/
+│   └── pipeline1/
+│   └── pipeline2/
+│   └── utils/
+├── metadata/
+├── Reference/
+├── analysis/
+└── ...
+```
+
+---
+
+## 📚 Related Setup Pages
+
+* 📦 [Reference Setup](reference_setup.qmd)
+* 🧬 [Metadata & Mapping Format](mapping.qmd)
+* 🔧 [Software Requirements](software.qmd)
+* 🐳 [Docker Setup](docker_guide.qmd)
+* 🧪 [Conda Environment](Conda.qmd)
+
+---
+
+## 📝 Notes
+
+If you encounter permission errors or missing dependencies, refer to [Troubleshooting](troubleshooting.qmd).
+
+```
+
+---
+
+Let me know if you want to include a section for installing a local Conda environment (`environment.yml`) or a helper `install.sh`.
+```
+

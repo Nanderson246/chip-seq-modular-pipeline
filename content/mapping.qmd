@@ -1,0 +1,119 @@
+---
+title: "Preprocessing Modules"
+---
+
+## 🗺️ Creating the `mapping.tsv` File (Metadata Table)
+
+The metadata file is crucial for automating sample grouping, identifying replicates, and selecting the appropriate peak caller.
+
+> 🧠 **Filename required:** `metadata/mapping.tsv`
+
+### ✅ Required Columns
+
++---------------+---------------------------------------+-------------------+
+| Column        | Description                           | Example           |
++===============+=======================================+===================+
+| `Sample_ID`   | Unique ID matching FASTQ or BAM files | `SRR123456`       |
++---------------+---------------------------------------+-------------------+
+| `Instrument`  | Sequencing instrument or platform     | `Illumina`        |
++---------------+---------------------------------------+-------------------+
+| `Sample_Type` | `ChIP`, `Input`, `IgG`, `Mock`, etc.  | `ChIP`            |
++---------------+---------------------------------------+-------------------+
+| `Condition`   | Experimental condition or group       | `Treated`, `WT`   |
++---------------+---------------------------------------+-------------------+
+| `Replicate`   | Replicate number (`1`, `2`, `3`, ...) | `1`               |
++---------------+---------------------------------------+-------------------+
+| `Target`      | Transcription factor or histone mark  | `H3K27ac`, `CTCF` |
++---------------+---------------------------------------+-------------------+
+
+### 📝 Optional Columns
+
+| Column       | Description                               | Example  |
+|--------------|-------------------------------------------|----------|
+| `Cell_line`  | Cell line used                            | `HEK293` |
+| `Spike_Type` | If spike-in is used (e.g., `dm6`, `ERCC`) | `dm6`    |
+
+### 📁 Example Structure
+
+``` tsv
+Sample_ID   Instrument  Sample_Type Condition   Replicate   Target  Cell_line   Spike_Type
+SRR001      Illumina    ChIP        WT          1         CTCF       HEK293     dm6
+SRR002      Illumina    ChIP        WT          2         CTCF       HEK293     dm6
+SRR003      Illumina    Input       WT          1         None       HEK293     dm6
+SRR004      Illumina    ChIP        KO          1         H3K27me3   HEK293     dm6
+SRR005      Illumina    ChIP        KO          2         H3K27me3   HEK293     dm6
+SRR006      Illumina    Input       KO          1         None       HEK293     dm6
+```
+
+------------------------------------------------------------------------
+
+### 🧪 Validation Steps
+
+Make sure your file is valid before starting the pipeline:
+
+1.  **Validate schema:**
+
+``` bash
+bash modules/utils/validate_mapping_yaml.sh templates/mapping_schema.yaml
+```
+
+2.  **Validate metadata:**
+
+``` bash
+python3 modules/utils/validate_mapping.py \
+  --mapping metadata/mapping.tsv \
+  --schema templates/mapping_schema.yaml
+```
+
+✔️ You should see “Validation Passed” if everything is correct.
+
+## 📋 What is `mapping.tsv` and Why Is It Important?
+
+### 🔍 What is it?
+
+The `mapping.tsv` is a **metadata table**—a plain text file in tab-separated format—that contains structured information about each sample in your ChIP-seq experiment. Each row represents a sequencing sample, and each column provides key attributes (e.g., sample ID, condition, replicate number, target protein, etc.).
+
+This file needs to be stored at:
+
+```         
+metadata/mapping.tsv
+```
+
+This mapping table will be transformed during the pipeline process: at then you will have a backup (mapping.tsv.bak), mapping_filtered.tsv (produce after replicates QC), and mapping_scaled.tsv (produced after bam cleaning, it contains the ratio of exogenous spike , if spike was detected, and the spike genome type).
+
+### 🧠 Why is it needed?
+
+This file is **critical** for enabling your pipeline to:
+
+✅ **Recognize and organize samples** automatically ✅ **Group replicates** (for IDR and reproducibility checks) ✅ **Assign controls** (Input, IgG, Mock) correctly for peak calling ✅ **Select peak caller styles** (e.g., narrowPeak for TFs, broadPeak for histone marks) ✅ **Validate input consistency** using the YAML schema
+
+Without this file, the pipeline wouldn’t know how your samples relate to each other—or how to process them correctly.
+
+### 🔗 How does the pipeline use it?
+
+-   **Pipeline 1:** The script `11_Renaming_bam.sh` uses the metadata to automatically rename BAM files and organize them into logical groups.
+
+-   **Pipeline 2:** Several scripts (e.g., `01_replicate_qc.sh`, `03_1_MACS3_peak_calling.sh`) read `mapping.tsv` to apply the right rules for:
+
+    -   Sample pairing (ChIP vs. Input)
+    -   Replicate merging
+    -   Peak calling type
+    -   Reproducibility evaluation (IDR)
+
+-   **Validation scripts** (`validate_mapping.py`, `validate_mapping_yaml.sh`) ensure the file is complete and follows strict format rules before any analysis starts.
+
+### 🧬 Summary
+
++-------------------------+------------------------------------------------------------+
+| Feature                 | Why it matters                                             |
++=========================+============================================================+
+| **Automation**          | Removes manual handling of sample groups                   |
++-------------------------+------------------------------------------------------------+
+| **Reproducibility**     | Ensures the same logic applies every time                  |
++-------------------------+------------------------------------------------------------+
+| **Compatibility**       | Lets the pipeline work across diverse experimental designs |
++-------------------------+------------------------------------------------------------+
+| **Quality control**     | Prevents broken analyses due to misannotated samples       |
++-------------------------+------------------------------------------------------------+
+
+------------------------------------------------------------------------

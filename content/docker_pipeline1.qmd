@@ -1,0 +1,68 @@
+---
+title: "🐳 Running Pipeline1 with Docker"
+---
+
+## 🏃 Running Pipeline1 with Docker
+
+🐳 Docker Usage Guide
+
+This guide explains **how to build and run** the ChIP-seq processing pipeline using Docker. It is designed for users at all levels, including beginners.
+
+While the original pipeline was created to work directly in Host-based installation, the pipeline can be used with docker containers and mounting the required folder needed for the package This pipeline is fully containerized and can be run with a single Docker command. Below is the recommended usage to **preserve outputs**, access your own data, and avoid re-downloading references.
+
+------------------------------------------------------------------------
+
+### 🔧 Docker Requirements
+
+-   Docker installed and working (`docker --version`)
+
+-   Your working directory should contain:
+
+    -   `Reference/` — genome files (e.g. `hg38`, `mm10`, etc.)
+    -   `metadata/` — sample sheet (`SRR_Acc_List.txt`, etc.)
+    -   `samples/` — (optional) pre-existing FASTQs
+    -   `results/` — (created if missing) final output goes here
+    -   `logs/` — (created if missing) all logs go here
+
+------------------------------------------------------------------------
+
+### 🧪 Run Command (Example)
+
+``` bash
+docker run --rm \
+  -v "$PWD/Reference":/pipeline/Reference \
+  -v "$PWD/SpikeinReference":/pipeline/SpikeinReference \
+  -v "$PWD/metadata":/pipeline/metadata \
+  -v "$PWD/samples":/pipeline/samples \
+  -v "$PWD/results":/pipeline/results \
+  -v "$PWD/logs":/pipeline/logs \
+  -v "$PWD/logs":/pipeline/assets \
+  pipeline1:latest -t 4 -r mm10 -a tn5_truseq
+```
+
+------------------------------------------------------------------------
+
+### 📝 Explanation
+
++-------------------------+-----------------------------------------------------+
+| Option                  | Description                                         |
++=========================+=====================================================+
+| `--rm`                  | Removes container after run                         |
++-------------------------+-----------------------------------------------------+
+| `-v <host>:<container>` | Mounts folders into container                       |
++-------------------------+-----------------------------------------------------+
+| `-t 4`                  | Number of threads                                   |
++-------------------------+-----------------------------------------------------+
+| `-r mm10`               | Reference genome (`hg38`, `mm10`, etc.)             |
++-------------------------+-----------------------------------------------------+
+| `-a tn5_truseq`         | Adapter type (should match what's in your pipeline) |
++-------------------------+-----------------------------------------------------+
+| `pipeline1:latest`      | Docker image name                                   |
++-------------------------+-----------------------------------------------------+
+
+------------------------------------------------------------------------
+
+### 📂 Output
+
+All outputs go into your local `results/` and `logs/` folders — no data is lost after the container exits.
+

@@ -1,0 +1,15 @@
+---
+title: "Troubleshooting"
+---
+❗ **Troubleshooting / FAQ"**
+
+1.  🔍 Metadata Validation Fails
+
+2.  🛑 IDR Errors: NumPy or Missing Peaks
+
+3.  ⚠️ Docker Mount Issues Troubleshooting & FAQ \*\*
+
+4.  🔍 Metadata Validation Fails
+
+5.  🛑 IDR Errors: NumPy or Missing Peaks 4.3 ⚠️ Docker Mount Issues
+

@@ -1,0 +1,148 @@
+---
+title: "Overview"
+---
+
+## 🧬 Overview
+
+This pipeline was developed and tested on Linux with POSIX-compliant behavior, macOS compatibility is not supported, If adjustments are needed for your system, you are free to modify the setup accordingly. This is the first version and still in beta test. However you can download and tested in your system as full package or use every modular script. The goal was to create a first Github project to establish Bioinformatic competence by the author.
+
+This project implements a modular and reproducible **ChIP-seq analysis pipeline** designed for both human and mouse samples. The pipeline is organized into two main parts:
+
+1.  **Preprocessing and BAM Cleaning** – Modular pipeline for data preparation.
+2.  **Peak Calling and Reproducibility Analysis** – Peak detection, quality control, and IDR-based reproducibility assessment.
+
+The pipeline supports both **HOMER** and **MACS3** workflows, and uses metadata-based automation. Its structure mirrors the **ENCODE ChIP-seq processing pipeline**, providing a modular, standardized workflow to produce reproducible peak calls, generate signal tracks, and perform quality assessments such as IDR (Irreproducible Discovery Rate), while automating sample naming and grouping.
+
+This package is intended to be flexible and modular. Each module can be customized by the user, or the pipeline can be run as-is. It is **not a beginner-friendly pipeline**, nor was it designed to be. The pipeline runs directly in Bash on a Linux system. Docker files are included to allow execution within containers, and a brief guide is provided at the end of this text, explaining how to build the container and mount the required folders properly.
+
+To run this pipeline you will need to have your paired fastq.gz samples in the samples folder, a mapping.tsv data, and to set the reference files in the Reference folder and the spike reference genomes in the SpikeinReference folder.
+
+The package provide two dataset test from GEO dataset to test Hg38 and mm10 samples.
+
+Information about these two GEO datasets is provided in the README.md file inside the examples/ folder. The pipeline1 is adapted to automatically download an SRR_Acc_List.txt if the list in the metadata folder. We also provide the mapping.tsv as example
+
+------------------------------------------------------------------------
+
+## 📚 Pipeline Components
+
+### 🔧 1. **Read Preprocessing and Alignment**
+
+**Input:** FASTQ files (`reads`)
+
+**Tools Used:**
+
+-   `cutadapt`: Adapter trimming
+-   `BWA`: Alignment to reference genome
+-   `Samtools`, `Picard`: Sorting, deduplication, indexing, BAM cleanup
+
+**Outputs:**
+
+-   Unfiltered alignments
+-   Filtered, deduplicated BAM files
+-   Removal of excluded/blacklisted regions (e.g., ENCODE blacklist)
+
+------------------------------------------------------------------------
+
+## 🔬 Replicate Quality Control with **deepTools**
+
+This pipeline uses **deepTools** (e.g., `plotFingerprint`, `multiBamSummary`) to evaluate replicate quality.
+
+### ✅ Advantages of deepTools:
+
+-   🧪 **Modern and actively maintained** – compatible with recent Python environments
+-   📊 **Fingerprint and cross-correlation plots** – assess ChIP enrichment and background
+-   ⚙️ **Format flexibility** – supports BAM and BigWig
+-   🐳 **Container-friendly** – easy to integrate in Docker-based workflows
+-   📁 **Multi-sample analysis** – supports `multiBamSummary`, `plotCorrelation`
+
+Users can optionally replace this with **Relative Strand Correlation (RSC)** via the **ChIPQC R package** by editing the relevant module — showcasing the pipeline's modularity.
+
+------------------------------------------------------------------------
+
+### ❓ Why not use `phantompeakqualtools`?
+
+Although once widely used to assess replicate quality, `phantompeakqualtools` is now:
+
+-   🛑 Outdated and no longer actively maintained
+-   🐪 Depends on legacy Perl environments and outdated tools like CClang v5
+-   🧱 Hard to containerize or integrate into modern pipelines
+
+Therefore, it has been replaced by more maintainable alternatives in this workflow.
+
+------------------------------------------------------------------------
+
+### 📈 2. **Signal Generation**
+
+**Tools:**
+
+-   MACS3: Generates signal tracks (bedGraph or bigWig)
+-   BEDTools: For further manipulation
+
+**Outputs:**
+
+-   Signal p-value tracks
+-   Fold change over control tracks
+
+------------------------------------------------------------------------
+
+### 📍 3. **Peak Calling**
+
+**Performed on:**
+
+-   Individual replicates
+-   Pooled replicates
+-   Pseudoreplicates
+
+**Tools:**
+
+-   MACS3 or HOMER
+
+**Outputs:**
+
+-   Replicated peaks
+-   Pooled peaks
+-   Pseudoreplicated peaks
+
+------------------------------------------------------------------------
+
+### 📊 4. **IDR Analysis**
+
+**Tool:** [`idr`](https://github.com/nboley/idr) — used to assess peak reproducibility
+
+This pipeline uses a **patched IDR version** compatible with the latest `numpy`, avoiding the need to downgrade.
+
+------------------------------------------------------------------------
+
+### 🛠 Patch + Install IDR (NumPy Compatibility)
+
+```         
+bash
+    wget https://github.com/kundajelab/idr/archive/refs/tags/2.0.4.2.tar.gz && \
+    tar -xvf 2.0.4.2.tar.gz && \
+    cd idr-2.0.4.2/idr && \
+    sed -i 's/numpy.int/int/g' idr.py && \
+    cd .. && \
+    pip install . --break-system-packages && \
+    rm -rf /opt/idr-2.0.4.2 /opt/2.0.4.2.tar.gz
+```
+
+**Outputs:**
+
+-   IDR-ranked peaks
+-   IDR-thresholded peaks
+-   Conservative IDR peaks
+
+------------------------------------------------------------------------
+
+### 🔁 5. **Replicate/Partition Concordance**
+
+Assesses consistency of peaks across replicates and pseudoreplicates.
+
+------------------------------------------------------------------------
+
+### 🧾 6. **Format Conversion and Final Outputs**
+
+Covers conversion to final formats for visualization, downstream analysis, or submission.
+
+------------------------------------------------------------------------
+

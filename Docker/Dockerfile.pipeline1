@@ -1,0 +1,94 @@
+# ------------------------------------------------------------------------------
+# Dockerfile for pipeline1
+# Maintainer: Nancy Anderson
+# Base: Ubuntu with bioinformatics & R packages
+# ------------------------------------------------------------------------------
+
+FROM ubuntu:22.04
+
+LABEL maintainer="Nancy Anderson"
+LABEL description="Container for Chip-seq and ATAC-seq pipeline1 with full software stack"
+
+# ------------------------------------------------------------------------------
+#Use non-interactive mode for apt & configuration (UTF-8)
+# ------------------------------------------------------------------------------
+
+ENV DEBIAN_FRONTEND=noninteractive \
+    LANG=C.UTF-8 \
+    LC_ALL=C.UTF-8 \
+    PATH="/pipeline/tools:$PATH"
+
+# ------------------------------------------------------------------------------
+# === System + Core utilities ===
+# ------------------------------------------------------------------------------
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    bash \
+    coreutils \
+    findutils \
+    gawk \
+    grep \
+    unzip \
+    wget \
+    curl \
+    git \
+    make \
+    openjdk-11-jre-headless \
+    r-base \
+    python3 \
+    python3-pip \
+    fastqc \
+    multiqc \
+    samtools \
+    bedtools \
+    parallel \
+    cutadapt \
+    procps \
+    sysstat \
+    zlib1g \
+    zlib1g-dev \
+    build-essential \
+    dfu-util \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# ------------------------------------------------------------------------------
+# Install SRA Toolkit (prefetch, fasterq-dump)
+# ------------------------------------------------------------------------------
+
+RUN wget -q https://ftp-trace.ncbi.nlm.nih.gov/sra/sdk/current/sratoolkit.current-ubuntu64.tar.gz && \
+    tar -xzf sratoolkit.current-ubuntu64.tar.gz && \
+    mv sratoolkit.* /opt/sratoolkit && \
+    ln -s /opt/sratoolkit/bin/* /usr/local/bin/ && \
+    rm sratoolkit.current-ubuntu64.tar.gz
+
+# ------------------------------------------------------------------------------
+# Install R packages
+# ------------------------------------------------------------------------------
+
+RUN Rscript -e "install.packages(c('ggplot2', 'data.table', 'ggrepel', 'viridis', 'viridisLite'), repos='https://cloud.r-project.org')" && \
+    Rscript -e "if (!requireNamespace('BiocManager', quietly=TRUE)) install.packages('BiocManager', repos='https://cloud.r-project.org')" && \
+    Rscript -e "BiocManager::install(ask=FALSE, update=FALSE)"
+
+# ------------------------------------------------------------------------------
+# Set up working directory
+# ------------------------------------------------------------------------------
+
+WORKDIR /pipeline
+
+# ------------------------------------------------------------------------------
+# Copy pipeline files (adjust context path if needed)
+# ------------------------------------------------------------------------------
+
+COPY . /pipeline
+COPY tools/ /opt/pipeline2/tools/
+
+# Ensure tools are executable
+RUN chmod +x /pipeline/tools/qualimap/qualimap \
+    && chmod +x /pipeline/modules/pipeline1/*.sh
+
+# ------------------------------------------------------------------------------
+# === Default shell ===
+# ------------------------------------------------------------------------------
+
+CMD ["/bin/bash"]
+

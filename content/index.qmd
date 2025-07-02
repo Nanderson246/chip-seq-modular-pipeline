@@ -1,0 +1,57 @@
+---
+title: "ChIP-seq Modular Analysis Pipeline"
+format:
+  html:
+    toc: false
+    theme: cerulean
+---
+
+# 🧬 Welcome
+
+Welcome to the **ChIP-seq Modular Analysis Pipeline** documentation!
+
+This site provides a detailed manual for running and understanding the modular ChIP-seq pipeline developed by **Nancy Anderson**. It includes setup, usage, modules, metadata structure, Docker/Conda environments, and more.
+
+---
+
+## 📚 Sections
+
+- [Overview](overview.qmd)
+
+- [Pipeline 1: QC & Preprocessing](pipeline1.qmd)
+
+- [Pipeline 2: Peak Calling & Analysis](pipeline2.qmd)
+
+- [Metadata Guide](mapping.qmd)
+
+- [Docker Usage - Pipeline 1](docker_pipeline1.qmd)
+
+- [Docker Usage - Pipeline 2](docker_pipeline2.qmd)
+
+- [Unified Docker Guide](docker_guide.qmd)
+
+- [Conda Environment Setup](Conda.qmd)
+
+- [Software Requirements](software.qmd)
+
+- [Troubleshooting](troubleshooting.qmd)
+
+- [Citations](citations.qmd)
+
+- [License](license.qmd)
+
+---
+
+## 🧪 Quick Start
+
+If you're eager to run the pipeline quickly, jump to:
+
+👉 [Quick Start Guide](overview.qmd#quick-start---requirements)
+
+Or explore the **Docker options** for portable setup:
+
+👉 [Docker Setup](docker_guide.qmd)
+
+---
+
+

@@ -1,0 +1,72 @@
+Query DataSets for GSE262235
+https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE262235
+
+Link to download data: 
+https://www.ncbi.nlm.nih.gov/Traces/study/?acc=PRJNA1090869&o=acc_s%3Aa
+
+https://www.ncbi.nlm.nih.gov/Traces/study/?acc=PRJNA1090869&o=acc_s%3Aa&s=SRR28422169,SRR28422170,SRR28422171,SRR28422172,SRR28422173,SRR28422174,SRR28422175,SRR28422176#
+
+You can get the metadata directly from SRA selector and downlaod the Accession List in the SRR_Acc_List.txt format.
+The SRR_Acc_List.txt need to be stored in the package metadata folder and pipeline1 will download the files automatically in the samples folder. This only need to be done once, once in the folder the pipeline will detect the presence against the list and will not repeat the download if samples are already there.
+
+In case you want to use your samples, Upload your samples in the samples folder, the pipeline will detect that there is not a NCBI list,but samples are present in the folder. All samples need to be in the mapping.tsv to be renamed and grouped at the end of the pipeline1 process.
+
+For this example dataset a mapping.tsv and the SRR_Acc_List.txt  are provided in the example folder. 
+Please copy the mapping.tsv and the SRR_Acc_List.txt to the metadata folder if you want to run this dataset and test the pipeline
+
+
+Library:
+Name: GSM8160923
+Instrument: Illumina NovaSeq 6000
+Strategy: ChIP-Seq
+Source: GENOMIC
+Selection: ChIP
+Layout: PAIRED
+
+
+https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE262235
+Mice data set
+BioProject	PRJNA1090869
+Submitted by: Cincinnati Children's Hospital Medical Center
+Study: muscle GR epigenomic changes with rs6190 SNP genocopy [ChIP-seq]
+Status	Public on Mar 21, 2025
+Title	muscle GR epigenomic changes with rs6190 SNP genocopy [ChIP-seq]
+Organism	Mus musculus
+Experiment type	Genome binding/occupancy profiling by high throughput sequencing
+Summary	this dataset encompasses the muscle GR epigenomic changes elicited in 4-month-old mice by the rs6190 genocopy allele
+ 	
+Overall design	We compared 4 months-old mice (C57BL/6J background) homozygous for the rs6190 SNP genocopy allele (R24K-homo) vs homozygous for the reference allele (R24K-WT). Quadriceps muscles were collected at ~ZT4 and immediately flash frozen for further processing.
+ 	
+Contributor(s)	Quattrocelli M, Prabakaran A
+Citation missing	Has this study been published? Please login to update or notify GEO.
+Submission date	Mar 22, 2024
+Last update date	Mar 21, 2025
+Contact name	Mattia Quattrocelli
+E-mail(s)	mattia.quattrocelli@cchmc.org
+Phone	5135171221
+Organization name	Cincinnati Children's Hospital Medical Center
+Street address	240 Sabin Way
+City	Cincinnati
+State/province	OH
+ZIP/Postal code	45248
+Country	USA
+ 	
+Platforms (1)	
+GPL24247	Illumina NovaSeq 6000 (Mus musculus)
+
+
+Platforms (1)	
+GPL24247	Illumina NovaSeq 6000 (Mus musculus)
+Samples (8)
+Less... Less...           
+GSM8160916	R24K-homo-1
+GSM8160917	R24K-homo-INPUT2
+GSM8160918	R24K-homo-3
+GSM8160919	R24K-WT-1
+GSM8160920	R24K-WT-INPUT2
+GSM8160921	R24K-WT-3
+GSM8160922	R24K-homo-2
+GSM8160923	R24K-WT-2
+
+
+

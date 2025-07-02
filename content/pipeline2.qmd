@@ -1,0 +1,227 @@
+---
+title: "🔄 Pipeline 2: Peak Calling, Reproducibility, and Functional Annotation"
+---
+
+Pipeline2 continues the analysis after preprocessing and alignment, performing replicate QC, peak calling, and reproducibility evaluation via IDR. It supports both MACS3 and HOMER peak callers, with outputs from both individual and pooled replicates.
+
+During the IDR evaluation, a series of QC analyses is performed, and an HTML/PDF report is generated and stored at:
+
+```
+
+analysis/IDR\_Results/homer/IDR\_qc\_summary/
+
+````
+
+The report includes and are in HTML and pdf format:
+
+- 🧬 Spike-In Detection Summary  
+- 📊 Replicate QC Plots & 🖋️ Fingerprint Curves (Pre-IDR)  
+- 🧬 PCR Bottleneck Coefficient (PBC)  
+- 📈 IDR Evaluation Plots  
+- 📊 FRiP Scores from Initial Peak Calling  
+- 🔹 High-confidence Peak Metrics  
+- 🔹 Replicate Agreement (Rescue & Self-Consistency)  
+- 🔹 Jaccard Overlap (Replicate Peak Similarity)
+
+### 📎 Example Reports
+
+👉 **hg38**: [📎 View report (PDF)](files/hg38_idr_report.pdf)  
+👉 **mm10**: [📎 View report (PDF)](files/mm10_idr_report.pdf)
+
+In addition to nearest-gene TSS annotation using HOMER, the pipeline performs **functional enrichment analysis entirely locally** — without relying on online services. Enrichment is based on:
+
+
+-   Gene Ontology (GO): Biological Process (BP), Cellular Component (CC), Molecular Function (MF)
+- Gene Ontology (GO): BP, CC, MF  
+- KEGG pathways  
+- Reactome pathways  
+- g:Profiler (via the local `gprofiler2` R package)  
+- `clusterProfiler` and `org.*.eg.db` annotation databases for human and mouse
+
+The final summary file `PRE_POSSIBLE_OUTCOME.tsv` integrates gene annotations across conditions, identifying **shared (intersection)** and **unique (condition-specific)** signals.
+
+## 🧬 Functional Enrichment Report
+
+The final enrichment summary report (including Gene Ontology, KEGG, Reactome, and g:Profiler figures) is available as a downloadable PDF and HTML.
+If the PRE_POSSIBLE_OUTCOME.tsv file is too large, the PDF will include only the g:Profiler figures. The full PRE_POSSIBLE_OUTCOME.tsv content will remain available in its original TSV format and within the HTML report.
+
+### 📎 Example Reports
+
+👉 **hg38**: [📎 View report (PDF)](files/hg38_Functional_Enrichment_Report_plots_only.pdf)  
+👉 **mm10**: [📎 View report (PDF)](files/mm10_Functional_Enrichment_Report.pdf)
+
+
+
+------------------------------------------------------------------------
+
+### 🚀 Usage: `run_pipeline2.sh`
+
+This script runs **Pipeline 2** — performing peak calling, replicate QC, IDR analysis, and functional annotation using MACS3 and HOMER.
+
+#### ✅ Default Run
+
+Run with all default parameters:
+
+```bash
+bash run_pipeline2.sh
+```
+
+This will use:
+
+* `REFERENCE = hg38`
+* `MAPPING = metadata/mapping.tsv`
+* `PEAK_CALLER = both` (MACS3 and HOMER)
+* `THREADS = 4`
+* `IDR_THRESHOLD = 0.05`
+* `TARGET_RULES = templates/target_peak_rules.yaml`
+* `TSS_DB = HOMER` (for annotation)
+
+> ✅ Defaults are suitable for most **ChIP-seq** and **ATAC-seq** use cases.
+
+------------------------------------------------------------------------
+
+#### 🔧 Full Custom Run
+
+Customize all parameters:
+
+```bash
+bash run_pipeline2.sh \
+  -r mm10 \
+  -m data/sample_metadata.tsv \
+  -p macs3 \
+  -t 8 \
+  -i 0.01 \
+  -y templates/target_peak_rules_HOMER.yaml \
+  --tss-db clusterProfiler
+```
+
+Explanation:
+
+* `-r mm10` → Use mouse genome
+* `-m data/sample_metadata.tsv` → Custom metadata file
+* `-p macs3` → Use MACS3 only (can be `macs3`, `homer`, or `both`)
+* `-t 8` → Use 8 threads
+* `-i 0.01` → Adjust IDR threshold
+* `-y templates/target_peak_rules_HOMER.yaml` → Custom target rules
+* `--tss-db clusterProfiler` → Use `clusterProfiler` instead of HOMER for gene annotation.
+
+------------------------------------------------------------------------
+#### ℹ️ Help
+
+To see all options:
+
+```bash
+bash run_pipeline2.sh --help
+```
+------------------------------------------------------------------------
+### 📄 1. `mapping_schema.yaml` — Metadata Validation Rules
+
+Defines structure and validation logic for your `mapping.tsv` metadata.
+
+#### 🔍 Key Elements:
+
+-   **Required fields**: `Sample_ID`, `Instrument`, `Sample_Type`, `Condition`, `Replicate`, `Target`
+-   **Optional fields**: `Cell_line`, `Spike_Type`
+-   **Regex validation**: For fields like `Sample_Type`, `Replicate`
+
+#### ✅ Validate Schema File
+
+``` bash
+bash modules/utils/validate_mapping_yaml.sh templates/mapping_schema.yaml
+```
+#### ✅ Validate Metadata File
+
+```bash
+python3 modules/utils/validate_mapping.py \
+  --mapping metadata/mapping.tsv \
+  --schema templates/mapping_schema.yaml
+```
+
+------------------------------------------------------------------------
+
+### 📄 2. `target_peak_rules.yaml` — Peak Calling Styles (MACS3)
+
+This config determines which targets require **narrow** or **broad** peak calling.
+
+**Examples:**
+
+* `CTCF`, `MYC` → `narrowPeak`
+* `H3K27me3`, `EZH2` → `broadPeak`
+
+
+------------------------------------------------------------------------
+
+### 📄 3. `target_peak_rules_HOMER.yaml` — Peak Calling Styles (HOMER)
+
+Classifies targets by **style** for `findPeaks`:
+
+* `factor` → e.g., `MYC`, `SOX2`
+* `histone` → e.g., `H3K27me3`, `EZH2`
+* `GROseq`, `DNaseI`, etc.
+
+> ⚠️ Note: These files are pre-validated. If you add new targets, you must write your own validation.
+
+------------------------------------------------------------------------
+
+## 📊 Modules: `01_replicate_qc.sh` to `06_igv_snapshot.sh`
+
+```         
+modules/pipeline2/
+├── 01_replicate_qc.sh
+├── 02_merge_pseudoreplicates.sh
+├── 03_1_MACS3_peak_calling.sh
+├── 03_2_homer_peak_calling_fold_fdr_relaxed.sh
+├── 03_2_homer_to_peakFormat.R
+├── 03_3_MACS3_peak_calling_pooled_pseudoreps.sh
+├── 03_4_homer_peak_calling_pooled_pseudoreps.sh
+├── 04_plot_idr_summary.R
+├── 04_run_idr.sh
+├── 05_peak_annotation.sh
+├── 06_igv_snapshot.sh
+└── cluster_enrichment_updated_hg_mice.R
+```
+
+### 🔧 Modules
+
+| Script                                         | Purpose                                                                                        |
+|-------------------------|-----------------------------------------------|
+| `01_replicate_qc.sh`                           | Analyzes biological replicates for correlation (cutoff: 0.8), filters low-correlation samples. |
+| `02_merge_pseudoreplicates.sh`                 | Merges BAMs and creates pseudo-replicates for IDR.                                             |
+| `03_1_MACS3_peak_calling.sh`                   | Peak calling using MACS3 with smart baseline control matching.                                 |
+| `03_2_homer_peak_calling_fold_fdr_relaxed.sh`  | HOMER-based peak calling using `target_peak_rules_HOMER.yaml`.                                 |
+| `03_3_MACS3_peak_calling_pooled_pseudoreps.sh` | MACS3 peak calling for pooled/pseudo BAMs.                                                     |
+| `03_4_homer_peak_calling_pooled_pseudoreps.sh` | HOMER peak calling for pooled/pseudo BAMs.                                                     |
+| `04_run_idr.sh`                                | Runs IDR on replicate pairs, pooled vs individual, etc.                                        |
+| `05_peak_annotation.sh`                        | Performs TSS annotation of peak files.                                                         |
+| `06_igv_snapshot.sh`                           | Generates IGV snapshots for peak visualization.                                                |
+|                                                |                                                                                                |
+
+> ⚠️ Note :06_igv_snapshot.sh is an extra module not yet adapted to the pipeline. This particular script produce to many snapshots if the user do not define the peaks based on their needs. ------------------------------------------------------------------------
+
+## 🗂 Analysis Folder Structure
+
+```         
+analysis$ tree -L 1
+.
+├── BAM_replicate_fail
+├── ChIPseeker_TSS_Hommer_IDR_annotation
+├── IDR_Results
+│   ├── homer
+│   └── macs3
+├── PeakCalling_HOMER
+├── PeakCalling_HOMER_pool_pseudo
+├── PeakCalling_MACS3
+├── PeakCalling_MACS3_pool_pseudo
+├── Pooled_BAMs
+├── pooling_log.tsv
+├── Pool_Pseudo_QC_stats
+├── Pseudoreplicates
+├── Renamed_Cleaned
+└── Replicate_QC
+    ├── bigwig
+    ├── deeptools
+    ├── pbc_metrics.tsv
+    └── tmp_groups
+```
+
+------------------------------------------------------------------------

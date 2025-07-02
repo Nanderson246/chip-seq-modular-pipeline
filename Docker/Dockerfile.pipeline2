@@ -1,0 +1,91 @@
+# ------------------------------------------------------------------------------
+# Dockerfile for pipeline1
+# Maintainer: Nancy Anderson
+# Base: Ubuntu with bioinformatics & R packages
+# ------------------------------------------------------------------------------
+
+FROM ubuntu:22.04
+
+LABEL maintainer="Nancy Anderson <n.anderson@comcast.net>" \
+      version="2.0" \
+      description="Docker container for ChIP-seq pipeline2 with HOMER, MACS3, IDR, and DeepTools support"
+
+# Use non-interactive mode for apt
+ENV DEBIAN_FRONTEND=noninteractive
+
+# === System + Core utilities ===
+RUN apt-get update && apt-get install -y \
+    bash \
+    build-essential \
+    wget \
+    curl \
+    git \
+    python3 \
+    python3-dev \
+    python3-pip \
+    cython \
+    r-base \
+    bedtools \
+    samtools \
+    yq \
+    bc \
+    parallel \
+    unzip \
+    libcurl4-openssl-dev \
+    libxml2-dev \
+    libssl-dev \
+    fonts-dejavu \
+    libfontconfig1 \
+    zlib1g-dev && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
+    
+# === Locale configuration (UTF-8) ===
+RUN locale-gen en_US.UTF-8
+ENV LANG=en_US.UTF-8 \
+    LANGUAGE=en_US:en \
+    LC_ALL=en_US.UTF-8    
+
+# === Python packages ===
+RUN pip3 install --upgrade pip && \
+    pip3 install deeptools==3.5.6 macs3 yq
+
+# === IDR patched installation (numpy compatibility fix) ===
+WORKDIR /opt
+RUN wget https://github.com/kundajelab/idr/archive/refs/tags/2.0.4.2.tar.gz && \
+    tar -xvf 2.0.4.2.tar.gz && \
+    cd idr-2.0.4.2/idr && \
+    sed -i 's/numpy.int/int/g' idr.py && \
+    cd .. && \
+    pip install . --break-system-packages && \
+    rm -rf /opt/idr-2.0.4.2 /opt/2.0.4.2.tar.gz
+
+# === HOMER installation ===
+RUN mkdir -p /opt/homer && \
+    cd /opt/homer && \
+    wget http://homer.ucsd.edu/homer/configureHomer.pl && \
+    perl configureHomer.pl -install && \
+    ln -s /opt/homer/bin/* /usr/local/bin/
+
+ENV PATH="/opt/homer/bin:$PATH"
+
+# === R packages: CRAN + Bioconductor ===
+RUN R -e "install.packages(c('dplyr', 'tidyr', 'stringr', 'ggplot2', 'readr', 'data.table', 'httr', 'jsonlite', 'tools', 'gprofiler2'), repos='https://cloud.r-project.org')" && \
+    R -e "if (!requireNamespace('BiocManager', quietly=TRUE)) install.packages('BiocManager', repos='https://cloud.r-project.org')" && \
+    R -e "BiocManager::install(c('clusterProfiler', 'enrichplot', 'ReactomePA', 'reactome.db', 'biomaRt', 'AnnotationDbi', 'org.Hs.eg.db', 'org.Mm.eg.db'), ask=FALSE, update=FALSE)"
+
+# === Working directory ===
+WORKDIR /data
+
+# === Copy pipeline tools and assets ===
+COPY tools/ /opt/pipeline2/tools/
+COPY assets/ /opt/pipeline2/assets/
+
+# === Set environment variables for pipeline ===
+ENV PATH="/opt/pipeline2/tools:$PATH"
+ENV PIPELINE_TOOLS_DIR="/opt/pipeline2/tools"
+ENV PIPELINE_ASSETS_DIR="/opt/pipeline2/assets"
+
+# === Default shell ===
+CMD ["/bin/bash"]
+
+

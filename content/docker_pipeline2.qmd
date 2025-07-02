@@ -1,0 +1,120 @@
+---
+title: "🐳 Running Pipeline2 with Docker"
+---
+
+------------------------------------------------------------------------
+
+### 👷‍️⛏️ 1. Build the Docker Image
+
+From the folder containing `Dockerfile.pipeline2`, run:
+
+``` bash
+docker build -f Dockerfile.pipeline2 -t pipeline2-image .
+```
+
+-   `-f`: specifies the Dockerfile to use.
+-   `-t`: tags the image name as `pipeline2-image`.
+-   `.`: tells Docker to build using the current directory context.
+
+------------------------------------------------------------------------
+
+### 📁 2. Project Structure
+
+A typical folder layout:
+
+```         
+your_project/
+├── run_pipeline2.sh
+├── modules/
+│   └── pipeline2/
+├── metadata/
+├── Reference/
+├── templates/
+├── logs/
+├── analysis/           # Will be populated by the pipeline
+```
+
+Ensure all these folders exist, especially `Reference/`, `metadata/`, and `modules/`.
+
+------------------------------------------------------------------------
+
+### 🗃️ 3. Mounting Folders
+
+To give Docker access to your files, bind-mount these folders:
+
++-------------------------------------------------------------------------------------+------------------------+-------------------------------------+
+| Host Path                                                                           | Docker Path            | Reason                              |
++=====================================================================================+========================+=====================================+
+| `$PWD`                                                                              | `/pipeline2`           | Root of your pipeline package       |
++-------------------------------------------------------------------------------------+------------------------+-------------------------------------+
+| `$PWD/Reference`                                                                    | `/pipeline2/Reference` | Genome files (FASTA, GTF, BED)      |
++-------------------------------------------------------------------------------------+------------------------+-------------------------------------+
+| `$PWD/metadata`                                                                     | `/pipeline2/metadata`  | Sample metadata for input           |
++-------------------------------------------------------------------------------------+------------------------+-------------------------------------+
+| `$PWD/templates`                                                                    | `/pipeline2/templates` | Mapping schema, rules               |
++-------------------------------------------------------------------------------------+------------------------+-------------------------------------+
+| `$PWD/logs`                                                                         | `/pipeline2/logs`      | Store logs                          |
++-------------------------------------------------------------------------------------+------------------------+-------------------------------------+
+| `$PWD/analysis`                                                                     | `/pipeline2/analysis`  | All analysis results are saved here |
++-------------------------------------------------------------------------------------+------------------------+-------------------------------------+
+| `$PWD/assets`                                                                       | `/pipeline2/assets`    | Contains images icon for the IDR    |
++-------------------------------------------------------------------------------------+------------------------+-------------------------------------+
+|                                                                                     |                        | report. Can be changed by user      |
++-------------------------------------------------------------------------------------+------------------------+-------------------------------------+
+| ----------------------------------------------------------------------------------- |                        |                                     |
++-------------------------------------------------------------------------------------+------------------------+-------------------------------------+
+
+### 🏃 4. Run the Pipeline
+
+Example command:
+
+``` bash
+docker run --rm \
+  -v "$PWD:/pipeline2" \
+  -v "$PWD/Reference:/pipeline2/Reference" \
+  -v "$PWD/metadata:/pipeline2/metadata" \
+  -v "$PWD/templates:/pipeline2/templates" \
+  -v "$PWD/logs:/pipeline2/logs" \
+  -v "$PWD/analysis:/pipeline2/analysis" \
+  -w /pipeline2 \
+  pipeline2-image \
+  bash run_pipeline2.sh --caller macs3 -genome mm10
+```
+
+------------------------------------------------------------------------
+
+### 📦 5. Output Files
+
+After running, the results will be in:
+
+-   `analysis/` — contains pipeline outputs and QC summaries
+-   `logs/` — contains module-specific logs
+-   `metadata/mapping_filtered_IDR.tsv` — filtered metadata after validation
+
+------------------------------------------------------------------------
+
+### 🛠️️️ 6. Optional: Helper Shell Script
+
+Create a script like `run.sh`:
+
+``` bash
+#!/bin/bash
+docker run --rm \
+  -v "$PWD:/pipeline2" \
+  -v "$PWD/Reference:/pipeline2/Reference" \
+  -v "$PWD/metadata:/pipeline2/metadata" \
+  -v "$PWD/templates:/pipeline2/templates" \
+  -v "$PWD/logs:/pipeline2/logs" \
+  -v "$PWD/analysis:/pipeline2/analysis" \
+  -w /pipeline2 \
+  pipeline2-image \
+  bash run_pipeline2.sh "$@"
+```
+
+Then run it like this:
+
+``` bash
+chmod +x run.sh
+./run.sh --caller homer -genome mm10
+```
+

@@ -1,0 +1,51 @@
+---
+title: " 🐳 Docker guide"
+---
+
+Docker provides a reproducible, isolated environment for running the pipeline. Once the image is built, the entire analysis can be executed without requiring local software installations.
+
+### ⚙️ Running the Pipeline in Docker
+
+Use the following command to launch the container:
+
+```bash
+docker run -v "$PWD:/pipeline2" -w /pipeline2 pipeline2-image \
+  bash run_pipeline2.sh [options]
+```
+
+This command:
+
+- Mounts your current directory (`$PWD`) into the container at `/pipeline2`
+- Sets `/pipeline2` as the working directory
+- Executes the pipeline script inside the container
+
+### 📁 Project Structure Inside the Container
+
+Your pipeline files are accessible under:
+
+```
+/pipeline2/
+├── run_pipeline2.sh
+├── modules/pipeline2/
+├── metadata/
+├── Reference/
+├── logs/
+├── analysis/
+```
+
+Relative paths like `modules/pipeline2/04_run_idr.sh` will resolve correctly.
+
+---
+
+### 🔗 Docker Command Summary
+
+| Step              | Command                                                                 |
+|-------------------|-------------------------------------------------------------------------|
+| **Build image**   | `docker build -f Dockerfile.pipeline2 -t pipeline2-image .`             |
+| **Run pipeline**  | `docker run -v "$PWD:/pipeline2" -w /pipeline2 pipeline2-image ...`     |
+| **View results**  | Check output files in your local `analysis/` and `logs/` directories    |
+
+---
+
+For advanced options or troubleshooting, refer to the main documentation or contact the maintainers.
+

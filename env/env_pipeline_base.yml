@@ -1,0 +1,30 @@
+name: chipseq_pipeline_base
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.9
+  - pip
+  - numpy
+  - pandas
+  - pyyaml
+  - samtools>=1.14
+  - bedtools>=2.30.0
+  - bwa
+  - cutadapt>=4.0
+  - macs3
+  - deeptools
+  - jq
+  - r-base=4.2
+  - r-data.table
+  - r-ggplot2
+  - r-dplyr
+  - r-readr
+  - r-tidyr
+  - r-stringr
+  - r-jsonlite
+  - r-httr
+  - r-remotes
+  - pip:
+      - idr

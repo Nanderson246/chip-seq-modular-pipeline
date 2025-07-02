@@ -1,0 +1,22 @@
+---
+title: "📚 Tool Citations"
+---
+
+We respectfully acknowledge the following software used in this pipeline:
+
+-   **Cutadapt** — Martin (2011) [DOI: 10.14806/ej.17.1.200](https://doi.org/10.14806/ej.17.1.200)\
+-   **BWA** — Li and Durbin (2009) [PMID: 19451168](https://pubmed.ncbi.nlm.nih.gov/19451168/)\
+-   **SAMtools** — Li et al. (2009) [PMID: 19505943](https://pubmed.ncbi.nlm.nih.gov/19505943/)\
+-   **MACS3** — Zhang et al. (2008) [PMID: 18798982](https://pubmed.ncbi.nlm.nih.gov/18798982/)\
+-   **HOMER** — Heinz et al. (2010) [PMID: 20513432](https://pubmed.ncbi.nlm.nih.gov/20513432/)\
+-   **Picard** — Broad Institute <https://broadinstitute.github.io/picard/>\
+-   **deepTools** — Ramírez et al. (2016) [PMID: 27079975](https://pubmed.ncbi.nlm.nih.gov/27079975/)\
+-   **Qualimap** — Okonechnikov et al. (2016) [PMID: 27040156](https://pubmed.ncbi.nlm.nih.gov/27040156/)\
+-   **IDR** — Li et al. (2011) [PMID: 21300883](https://pubmed.ncbi.nlm.nih.gov/21300883/)\
+-   **clusterProfiler** — Yu et al. (2012) [PMID: 22455463](https://pubmed.ncbi.nlm.nih.gov/22455463/)\
+-   **ReactomePA** — Yu and He (2016) [PMID: 27480138](https://pubmed.ncbi.nlm.nih.gov/27480138/)\
+-   **yq** — Mike Farah (v4+), GitHub: <https://github.com/mikefarah/yq>
+
+And others listed in the software requirements section above.
+
+> ⚠️ For academic use, please cite the original tools if you rely on results from this pipeline.

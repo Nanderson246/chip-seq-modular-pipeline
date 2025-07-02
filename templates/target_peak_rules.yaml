@@ -1,0 +1,46 @@
+# Classification of common ChIP-seq targets for MACS3 peak mode
+
+narrow_peak_targets:
+  - CTCF
+  - MYC
+  - G4
+  - BRD4
+  - E2F1
+  - SP1
+  - TP53
+  - NANOG
+  - SOX2
+  - OCT4
+  - R-loop
+  - RNAPII
+  - TFAP2C
+  - FOXA1
+  - EP300
+  - H3K4me3
+  - H3K9ac
+  - H3K27ac
+  - MED1
+  - P300
+  - CBP
+  - BACH1
+  - ATF4
+
+broad_peak_targets:
+  - H3K27me3
+  - H3K9me3
+  - H3K36me3
+  - H3K79me2
+  - H3K4me1_broad
+  - H3K27ac_broad
+  - HP1
+  - MeCP2
+  - LaminB1
+  - Cohesin
+  - EZH2
+  - SUZ12
+  - H4K20me1
+  - H4K20me3
+  - H3K9me2
+  - SETDB1
+  - Polycomb
+

@@ -1,0 +1,125 @@
+---
+title: "🐍 Core enviroment:conda"
+---
+
+### ✅ 1. `env_pipeline_base.yml` — Core environment
+
+Below are two separate **Conda environment YAML files**:
+
+This includes all necessary packages for running the pipeline in a non-Docker setup, excluding R packages and HOMER.
+
+``` yaml
+name: chipseq_pipeline_base
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.9
+  - pip
+  - numpy
+  - pandas
+  - pyyaml
+  - samtools>=1.14
+  - bedtools>=2.30.0
+  - bwa
+  - cutadapt>=4.0
+  - macs3
+  - deeptools
+  - jq
+  - r-base=4.2
+  - r-data.table
+  - r-ggplot2
+  - r-dplyr
+  - r-readr
+  - r-tidyr
+  - r-stringr
+  - r-jsonlite
+  - r-httr
+  - r-remotes  # for installing from GitHub
+  - pip:
+      - idr  # we patch it manually later
+```
+
+------------------------------------------------------------------------
+
+### ✅ 2. `env_pipeline_r.yml` — Optional: R + Bioconductor setup
+
+Use this to install additional R packages (run after activating `chipseq_pipeline_base`):
+
+``` r
+# In R
+if (!requireNamespace("BiocManager", quietly = TRUE))
+  install.packages("BiocManager")
+
+BiocManager::install(c(
+  "AnnotationDbi",
+  "clusterProfiler",
+  "enrichplot",
+  "ReactomePA",
+  "reactome.db",
+  "biomaRt",
+  "org.Mm.eg.db",   # for mouse
+  "org.Hs.eg.db"    # for human
+))
+```
+
+------------------------------------------------------------------------
+
+## ⚙️ Software Requirements (Non-Docker Setup)
+
+While this pipeline is fully Docker-compatible, you can also run it natively by installing the required software through **🐍 Conda** and **📘 ℝ** .
+
+### 📁 Environment Files
+
+All environment setup files are located in:
+
+``` bash
+env/
+├── env_pipeline_base.yml     # Conda YAML file (base system + CLI tools)
+├── env_pipeline_r.R          # R script to install required R/Bioconductor packages
+```
+
+### 🧪 Step 1: Create Conda Environment
+
+Use the provided YAML file to create a clean Conda environment with all the command-line tools.
+
+``` bash
+conda env create -f env/env_pipeline_base.yml
+conda activate chipseq_pipeline_base
+```
+
+### 📦 Step 2: Install R and Bioconductor Packages
+
+Once inside the conda environment, install the required R packages using:
+
+``` bash
+Rscript env/env_pipeline_r.R
+```
+
+This script will:
+
+-   Check for missing CRAN or Bioconductor dependencies
+-   Install them as needed
+-   Load the correct annotation packages for both human (hg38) and mouse (mm10) genomes
+
+### 🧰 Tool Dependencies
+
+Some tools like `picard.jar` and `qualimap` are **not installed via Conda** but are required. These are bundled inside the pipeline under:
+
+``` bash
+tools/
+├── picard.jar      # Required for BAM metadata tagging
+├── qualimap/       # For BAM quality metrics (must be Java-compatible)
+```
+
+Make sure:
+
+-   `tools/picard.jar` is accessible (used by `AddOrReplaceReadGroups`)
+-   `tools/qualimap/` is executable and on your `PATH` or referenced directly by the scripts
+
+Ensure these are available in your environment or adjust the relevant paths in the pipeline scripts.
+
+🐳 Or Use Docker For reference, installation steps are also reflected in the Dockerfiles:
+
+bash Copy Edit Dockerfile.pipeline1 Dockerfile.pipeline2 These show the exact installation process and can be adapted for manual setup if needed.

@@ -1,0 +1,95 @@
+---
+title: " 🧰 Software Requirements (Non-Docker Setup)"
+---
+
+## 🧰 Software Requirements (Non-Docker Setup)
+
+If you're running the pipeline without Docker, your system must have the following tools installed and available in your PATH — except for picard.jar and qualimap, which are already bundled in the pipeline under tools/ and should remain there.
+
+### 📦 Core Requirements
+
+Install the following tools via your package manager (`apt`, `brew`, `conda`, etc.) or from source as needed:
+
++----------------+-------------------+-------------------------------------+
+| Tool           | Minimum Version   | Purpose                             |
++================+===================+=====================================+
+| `bash`         | 4.0+              | Shell scripting                     |
++----------------+-------------------+-------------------------------------+
+| `cutadapt`     | 4.0+              | Adapter trimming                    |
++----------------+-------------------+-------------------------------------+
+| `bwa`          | 0.7.17+           | Read alignment                      |
++----------------+-------------------+-------------------------------------+
+| `samtools`     | 1.14+             | BAM/SAM manipulation                |
++----------------+-------------------+-------------------------------------+
+| `picard`       | 2.26.10+          | BAM post-processing                 |
++----------------+-------------------+-------------------------------------+
+| `macs3`        | 3.0.0a6+          | Peak calling                        |
++----------------+-------------------+-------------------------------------+
+| `homer`        | v4.11+            | Alternative peak calling            |
++----------------+-------------------+-------------------------------------+
+| `python3`      | 3.9+              | Used for helper scripts             |
++----------------+-------------------+-------------------------------------+
+| `pip`          | Latest            | Python package management           |
++----------------+-------------------+-------------------------------------+
+| `R`            | 4.2+              | Statistical computing environment   |
++----------------+-------------------+-------------------------------------+
+| `Rscript`      | 4.2+              | Script execution for R modules      |
++----------------+-------------------+-------------------------------------+
+| `bedtools`     | 2.30.0+           | Genomic interval operations         |
++----------------+-------------------+-------------------------------------+
+| `deepTools`    | 3.5.1+            | QC and coverage tools               |
++----------------+-------------------+-------------------------------------+
+| `idr`          | 2.0.4.2 (patched) | Peak reproducibility scoring        |
++----------------+-------------------+-------------------------------------+
+| `jq`           | 1.6+              | JSON parsing (metadata scripts)     |
++----------------+-------------------+-------------------------------------+
+| `wget`/`curl`  | any               | Data downloading                    |
++----------------+-------------------+-------------------------------------+
+| `yq`           | 4.0+              | YAML parsing and editing (Go-based) |
++----------------+-------------------+-------------------------------------+
+
+### 📚 Required Python Packages
+
+Install with:
+
+``` bash
+pip install numpy pandas pyyaml
+```
+
+### 📚 Required R Packages
+
+Your pipeline includes scripts that require the following **CRAN** and **Bioconductor** packages:
+
+#### From CRAN:
+
+-   `dplyr`
+-   `ggplot2`
+-   `tidyr`
+-   `data.table`
+-   `readr`
+-   `stringr`
+-   `tools`
+-   `jsonlite`
+-   `httr`
+
+#### From Bioconductor:
+
+-   `clusterProfiler`
+-   `enrichplot`
+-   `ReactomePA`
+-   `reactome.db`
+-   `biomaRt`
+-   `AnnotationDbi`
+-   `org.Hs.eg.db`
+-   `org.Mm.eg.db`
+
+> ✅ The R scripts automatically attempt to install missing packages if your internet connection is available.
+
+### 🧬 Optional (for full compatibility)
+
+-   `FastQC`
+-   `MultiQC`
+-   `IGV` (for manual visualization)
+-   `docker` (if you'd like to use pre-built containers)
+
+------------------------------------------------------------------------

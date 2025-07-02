@@ -1,0 +1,59 @@
+---
+title: "🧬 Initial documents and reference setups"
+---
+## 🔧 Utilities
+
+The following helper scripts are available in the `modules/utils/` directory for setup and validation:
+
+### 🧬 `setup_reference.sh`
+
+Automates the preparation of **genome reference** directories and indexes.
+
+**Usage:**
+
+``` bash
+bash modules/utils/setup_reference.sh <GENOME_NAME> <GENOME_FASTA>
+```
+
+**Example:**
+
+``` bash
+bash modules/utils/setup_reference.sh hg38 /path/to/hg38.fa
+```
+
+**What it does:**
+
+-   Creates a genome folder under `resources/genomes/GENOME_NAME/`
+
+-   Generates:
+
+    -   `.fai` index via `samtools faidx`
+    -   `bwa` index (`bwa index`)
+    -   Chromosome sizes (`.chrom.sizes`)
+    -   Dictionary via `picard CreateSequenceDictionary`
+
+### 🐝 `setup_spikein_refs.sh`
+
+Prepares **spike-in reference genomes** similarly to the main genome.
+
+**Usage:**
+
+``` bash
+bash modules/utils/setup_spikein_refs.sh <SPIKE_NAME> <SPIKE_FASTA>
+```
+
+**Example:**
+
+``` bash
+bash modules/utils/setup_spikein_refs.sh dm6 /path/to/dm6.fa
+```
+
+**Creates:**
+
+-   Indexed `bwa` genome and dictionary for the spike
+-   Organized under `resources/spikein/SPIKE_NAME/`
+
+These scripts **must be run before alignment steps** in the pipeline to ensure all genome/spike references are available and indexed properly.
+
+Let me know if you’d like a Makefile target to wrap these commands for common genomes (e.g., hg38 + dm6).
+
