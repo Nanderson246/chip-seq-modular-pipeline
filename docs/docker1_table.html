@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>🐳 Running Pipeline1 with Docker – ChIP-seq Modular Analysis Pipeline</title>
+<title>docker1_table – ChIP-seq Modular Analysis Pipeline</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -20,61 +20,26 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-/* CSS for syntax highlighting */
-html { -webkit-text-size-adjust: 100%; }
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-div.sourceCode { margin: 1em 0; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
-}
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-  }
-pre.numberSource { margin-left: 3em;  padding-left: 4px; }
-div.sourceCode
-  {   }
-@media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
-}
 </style>
 
 
-<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="../site_libs/quarto-nav/headroom.min.js"></script>
-<script src="../site_libs/clipboard/clipboard.min.js"></script>
-<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="../site_libs/quarto-search/fuse.min.js"></script>
-<script src="../site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="../">
-<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
-<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
-<script src="../site_libs/quarto-html/popper.min.js"></script>
-<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="../site_libs/quarto-html/anchor.min.js"></script>
-<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-dec293facc5f57232bb73e2f627a5456.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-dec293facc5f57232bb73e2f627a5456.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -104,7 +69,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 }</script>
 
 
-<link rel="stylesheet" href="../styles.css">
+<link rel="stylesheet" href="styles.css">
 </head>
 
 <body class="nav-sidebar docked quarto-light">
@@ -116,7 +81,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../content/docker_pipeline1.html">🐳 Running Pipeline1 with Docker</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">
+      ChIP-seq Modular Analysis Pipeline
+      </li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -131,7 +98,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
     <div class="pt-lg-2 mt-2 text-left sidebar-header">
     <div class="sidebar-title mb-0 py-0">
-      <a href="../">ChIP-seq Modular Analysis Pipeline</a> 
+      <a href="./">ChIP-seq Modular Analysis Pipeline</a> 
     </div>
       </div>
         <div class="mt-2 flex-shrink-0 align-items-center">
@@ -143,91 +110,91 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../content/index.html" class="sidebar-item-text sidebar-link">
+  <a href="./content/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">ChIP-seq Modular Analysis Pipeline</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../content/overview.html" class="sidebar-item-text sidebar-link">
+  <a href="./content/overview.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Overview</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../content/installation.html" class="sidebar-item-text sidebar-link">
+  <a href="./content/installation.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">⚙️ Installation Guide</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../content/reference_setup.html" class="sidebar-item-text sidebar-link">
+  <a href="./content/reference_setup.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">🧬 Initial documents and reference setups</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../content/pipeline1.html" class="sidebar-item-text sidebar-link">
+  <a href="./content/pipeline1.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">🔄 Pipeline 1: QC &amp; Preprocessing Modules</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../content/pipeline2.html" class="sidebar-item-text sidebar-link">
+  <a href="./content/pipeline2.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">🔄 Pipeline 2: Peak Calling, Reproducibility, and Functional Annotation</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../content/mapping.html" class="sidebar-item-text sidebar-link">
+  <a href="./content/mapping.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Preprocessing Modules</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../content/docker_pipeline1.html" class="sidebar-item-text sidebar-link active">
+  <a href="./content/docker_pipeline1.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">🐳 Running Pipeline1 with Docker</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../content/docker_pipeline2.html" class="sidebar-item-text sidebar-link">
+  <a href="./content/docker_pipeline2.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">🐳 Running Pipeline2 with Docker</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../content/docker_guide.html" class="sidebar-item-text sidebar-link">
+  <a href="./content/docker_guide.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">🐳 Docker guide</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../content/Conda.html" class="sidebar-item-text sidebar-link">
+  <a href="./content/Conda.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">🐍 Core enviroment:conda</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../content/software.html" class="sidebar-item-text sidebar-link">
+  <a href="./content/software.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">🧰 Software Requirements (Non-Docker Setup)</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../content/troubleshooting.html" class="sidebar-item-text sidebar-link">
+  <a href="./content/troubleshooting.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Troubleshooting</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../content/citations.html" class="sidebar-item-text sidebar-link">
+  <a href="./content/citations.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">📚 Tool Citations</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../content/license.html" class="sidebar-item-text sidebar-link">
+  <a href="./content/license.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">📄 MIT License</span></a>
   </div>
 </li>
@@ -241,221 +208,54 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#what-is-this" id="toc-what-is-this" class="nav-link active" data-scroll-target="#what-is-this"><span class="header-section-number">1</span> 📦 What Is This?</a></li>
-  <li><a href="#prerequisites" id="toc-prerequisites" class="nav-link" data-scroll-target="#prerequisites"><span class="header-section-number">2</span> ✅ Prerequisites</a></li>
-  <li><a href="#step-1-build-the-docker-image" id="toc-step-1-build-the-docker-image" class="nav-link" data-scroll-target="#step-1-build-the-docker-image"><span class="header-section-number">3</span> 🏗️ Step 1: Build the Docker Image</a></li>
-  <li><a href="#step-2-folder-structure" id="toc-step-2-folder-structure" class="nav-link" data-scroll-target="#step-2-folder-structure"><span class="header-section-number">4</span> 📁 Step 2: Folder Structure</a></li>
-  <li><a href="#step-3-run-the-pipeline-default" id="toc-step-3-run-the-pipeline-default" class="nav-link" data-scroll-target="#step-3-run-the-pipeline-default"><span class="header-section-number">5</span> ▶️ Step 3: Run the Pipeline (Default)</a></li>
-  <li><a href="#step-4-run-with-custom-options" id="toc-step-4-run-with-custom-options" class="nav-link" data-scroll-target="#step-4-run-with-custom-options"><span class="header-section-number">6</span> ⚙️ Step 4: Run with Custom Options</a></li>
-  <li><a href="#troubleshooting-tips" id="toc-troubleshooting-tips" class="nav-link" data-scroll-target="#troubleshooting-tips"><span class="header-section-number">7</span> 🪛 Troubleshooting &amp; Tips</a></li>
-  <li><a href="#next-steps" id="toc-next-steps" class="nav-link" data-scroll-target="#next-steps"><span class="header-section-number">8</span> 🎯 Next Steps</a></li>
-  <li><a href="#output-overview" id="toc-output-overview" class="nav-link" data-scroll-target="#output-overview"><span class="header-section-number">9</span> 📂 Output Overview</a></li>
+  <li><a href="#explanation" id="toc-explanation" class="nav-link active" data-scroll-target="#explanation"><span class="header-section-number">0.1</span> 📝 Explanation</a></li>
   </ul>
 </nav>
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content">
-
-<header id="title-block-header" class="quarto-title-block default">
-<div class="quarto-title">
-<h1 class="title">🐳 Running Pipeline1 with Docker</h1>
-</div>
+<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"></header>
 
 
 
-<div class="quarto-title-meta">
 
-    
-  
-    
-  </div>
-  
-
-
-</header>
-
-
-<section id="what-is-this" class="level2" data-number="1">
-<h2 data-number="1" class="anchored" data-anchor-id="what-is-this"><span class="header-section-number">1</span> 📦 What Is This?</h2>
-<p>This guide explains how to build and run the <code>pipeline1</code> container for the ChIP-seq Modular Analysis Pipeline using Docker. It is beginner-friendly and reproducible.</p>
 <hr>
-</section>
-<section id="prerequisites" class="level2" data-number="2">
-<h2 data-number="2" class="anchored" data-anchor-id="prerequisites"><span class="header-section-number">2</span> ✅ Prerequisites</h2>
-<p>Make sure you have:</p>
-<ul>
-<li><a href="https://docs.docker.com/get-docker/">Docker installed</a></li>
-<li>A terminal open in the <strong>project root</strong> (<code>chip-seq-modular-pipeline/</code>)</li>
-</ul>
-<hr>
-</section>
-<section id="step-1-build-the-docker-image" class="level2" data-number="3">
-<h2 data-number="3" class="anchored" data-anchor-id="step-1-build-the-docker-image"><span class="header-section-number">3</span> 🏗️ Step 1: Build the Docker Image</h2>
-<p>From the <strong>project root</strong>, run:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> build <span class="at">-f</span> Docker/Dockerfile.pipeline1 <span class="at">-t</span> pipeline1-test .</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Where:</p>
-<ul>
-<li><code>-f</code> tells Docker which file to use</li>
-<li><code>-t pipeline1-test</code> names the image</li>
-<li><code>.</code> sets the build context (your entire repo)</li>
-</ul>
-<blockquote class="blockquote">
-<p>⏱️ First-time builds may take several minutes.</p>
-</blockquote>
-<hr>
-</section>
-<section id="step-2-folder-structure" class="level2" data-number="4">
-<h2 data-number="4" class="anchored" data-anchor-id="step-2-folder-structure"><span class="header-section-number">4</span> 📁 Step 2: Folder Structure</h2>
-<p>To ensure correct volume mounting inside the container, organize your folders like this:</p>
+<section id="explanation" class="level3" data-number="0.1">
+<h3 data-number="0.1" class="anchored" data-anchor-id="explanation"><span class="header-section-number">0.1</span> 📝 Explanation</h3>
 <table class="caption-top table">
 <colgroup>
-<col style="width: 23%">
-<col style="width: 35%">
-<col style="width: 41%">
+<col style="width: 32%">
+<col style="width: 67%">
 </colgroup>
 <thead>
 <tr class="header">
-<th>Host Folder</th>
-<th>Container Mount</th>
+<th>Option</th>
 <th>Description</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>samples/</code></td>
-<td><code>/pipeline/samples</code></td>
-<td>Raw sequencing input</td>
+<td><code>--rm</code></td>
+<td>Removes container after run</td>
 </tr>
 <tr class="even">
-<td><code>Reference/</code></td>
-<td><code>/pipeline/Reference</code></td>
-<td>Genome reference files</td>
+<td><code>-v &lt;host&gt;:&lt;container&gt;</code></td>
+<td>Mounts folders into container</td>
 </tr>
 <tr class="odd">
-<td><code>SpikeinReference/</code></td>
-<td><code>/pipeline/SpikeinReference</code></td>
-<td>Spike-in configs</td>
+<td><code>-t 4</code></td>
+<td>Number of threads</td>
 </tr>
 <tr class="even">
-<td><code>metadata/</code></td>
-<td><code>/pipeline/metadata</code></td>
-<td>Sample metadata and mapping files</td>
+<td><code>-r mm10</code></td>
+<td>Reference genome (<code>hg38</code>, <code>mm10</code>, etc.)</td>
 </tr>
 <tr class="odd">
-<td><code>templates/</code></td>
-<td><code>/pipeline/templates</code></td>
-<td>YAML/TSV configuration templates</td>
+<td><code>-a tn5_truseq</code></td>
+<td>Adapter type (should match what’s in your pipeline)</td>
 </tr>
 <tr class="even">
-<td><code>adapters/</code></td>
-<td><code>/pipeline/adapters</code></td>
-<td>Adapter files for trimming</td>
-</tr>
-<tr class="odd">
-<td><code>assets/</code></td>
-<td><code>/pipeline/assets</code></td>
-<td>Icons, logos, images, PDFs, etc.</td>
-</tr>
-<tr class="even">
-<td><code>modules/</code></td>
-<td><code>/pipeline/modules</code></td>
-<td>Pipeline logic and scripts</td>
-</tr>
-<tr class="odd">
-<td><code>results/</code></td>
-<td><code>/pipeline/results</code></td>
-<td>Output from pipeline1</td>
-</tr>
-<tr class="even">
-<td><code>analysis/</code></td>
-<td><code>/pipeline/analysis</code></td>
-<td>Output passed to pipeline2</td>
-</tr>
-</tbody>
-</table>
-<blockquote class="blockquote">
-<p>🛠️ Docker will auto-create <code>results/</code> and <code>analysis/</code> if they don’t exist.</p>
-</blockquote>
-<hr>
-</section>
-<section id="step-3-run-the-pipeline-default" class="level2" data-number="5">
-<h2 data-number="5" class="anchored" data-anchor-id="step-3-run-the-pipeline-default"><span class="header-section-number">5</span> ▶️ Step 3: Run the Pipeline (Default)</h2>
-<p>To run the default pipeline with standard parameters:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">--rm</span> <span class="at">-it</span> <span class="dt">\</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">-v</span> <span class="st">"</span><span class="va">$PWD</span><span class="st">/samples:/pipeline/samples"</span> <span class="dt">\</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">-v</span> <span class="st">"</span><span class="va">$PWD</span><span class="st">/Reference:/pipeline/Reference"</span> <span class="dt">\</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">-v</span> <span class="st">"</span><span class="va">$PWD</span><span class="st">/SpikeinReference:/pipeline/SpikeinReference"</span> <span class="dt">\</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">-v</span> <span class="st">"</span><span class="va">$PWD</span><span class="st">/metadata:/pipeline/metadata"</span> <span class="dt">\</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">-v</span> <span class="st">"</span><span class="va">$PWD</span><span class="st">/templates:/pipeline/templates"</span> <span class="dt">\</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">-v</span> <span class="st">"</span><span class="va">$PWD</span><span class="st">/adapters:/pipeline/adapters"</span> <span class="dt">\</span></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">-v</span> <span class="st">"</span><span class="va">$PWD</span><span class="st">/assets:/pipeline/assets"</span> <span class="dt">\</span></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">-v</span> <span class="st">"</span><span class="va">$PWD</span><span class="st">/modules:/pipeline/modules"</span> <span class="dt">\</span></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">-v</span> <span class="st">"</span><span class="va">$PWD</span><span class="st">/results:/pipeline/results"</span> <span class="dt">\</span></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">-v</span> <span class="st">"</span><span class="va">$PWD</span><span class="st">/analysis:/pipeline/analysis"</span> <span class="dt">\</span></span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>  pipeline1-test bash run_pipeline1.sh</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<hr>
-</section>
-<section id="step-4-run-with-custom-options" class="level2" data-number="6">
-<h2 data-number="6" class="anchored" data-anchor-id="step-4-run-with-custom-options"><span class="header-section-number">6</span> ⚙️ Step 4: Run with Custom Options</h2>
-<p>Example with flags for genome, adapter, platform, and threads:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">--rm</span> <span class="at">-it</span> <span class="dt">\</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">-v</span> <span class="st">"</span><span class="va">$PWD</span><span class="st">/samples:/pipeline/samples"</span> <span class="dt">\</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">-v</span> <span class="st">"</span><span class="va">$PWD</span><span class="st">/Reference:/pipeline/Reference"</span> <span class="dt">\</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">-v</span> <span class="st">"</span><span class="va">$PWD</span><span class="st">/SpikeinReference:/pipeline/SpikeinReference"</span> <span class="dt">\</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">-v</span> <span class="st">"</span><span class="va">$PWD</span><span class="st">/metadata:/pipeline/metadata"</span> <span class="dt">\</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">-v</span> <span class="st">"</span><span class="va">$PWD</span><span class="st">/templates:/pipeline/templates"</span> <span class="dt">\</span></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">-v</span> <span class="st">"</span><span class="va">$PWD</span><span class="st">/adapters:/pipeline/adapters"</span> <span class="dt">\</span></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">-v</span> <span class="st">"</span><span class="va">$PWD</span><span class="st">/assets:/pipeline/assets"</span> <span class="dt">\</span></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">-v</span> <span class="st">"</span><span class="va">$PWD</span><span class="st">/modules:/pipeline/modules"</span> <span class="dt">\</span></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">-v</span> <span class="st">"</span><span class="va">$PWD</span><span class="st">/results:/pipeline/results"</span> <span class="dt">\</span></span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">-v</span> <span class="st">"</span><span class="va">$PWD</span><span class="st">/analysis:/pipeline/analysis"</span> <span class="dt">\</span></span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  pipeline1-test bash run_pipeline1.sh <span class="dt">\</span></span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">-t</span> 8 <span class="dt">\</span></span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">-r</span> mm10 <span class="dt">\</span></span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">-a</span> tn5_nextera <span class="dt">\</span></span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">-p</span> IONTORRENT <span class="dt">\</span></span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">-m</span> metadata/mapping.tsv <span class="dt">\</span></span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">-f</span> csv</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<hr>
-</section>
-<section id="troubleshooting-tips" class="level2" data-number="7">
-<h2 data-number="7" class="anchored" data-anchor-id="troubleshooting-tips"><span class="header-section-number">7</span> 🪛 Troubleshooting &amp; Tips</h2>
-<ul>
-<li>✅ Run Docker <strong>inside</strong> your project folder.</li>
-<li>✅ Mount <code>results/</code> and <code>analysis/</code> to keep output.</li>
-<li>🐞 To debug interactively:</li>
-</ul>
-<div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">--rm</span> <span class="at">-it</span> pipeline1-test</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Then inside the container:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">bash</span> run_pipeline1.sh <span class="at">-t</span> 4 <span class="at">-r</span> hg38</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<hr>
-</section>
-<section id="next-steps" class="level2" data-number="8">
-<h2 data-number="8" class="anchored" data-anchor-id="next-steps"><span class="header-section-number">8</span> 🎯 Next Steps</h2>
-<p>Once <code>pipeline1</code> finishes, you can move to <code>pipeline2</code> using <code>analysis/</code> as input.</p>
-<hr>
-</section>
-<section id="output-overview" class="level2" data-number="9">
-<h2 data-number="9" class="anchored" data-anchor-id="output-overview"><span class="header-section-number">9</span> 📂 Output Overview</h2>
-<table class="caption-top table">
-<thead>
-<tr class="header">
-<th>Folder</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><code>results/</code></td>
-<td>Output results from pipeline1</td>
-</tr>
-<tr class="even">
-<td><code>analysis/</code></td>
-<td>Used later as input for <code>pipeline2</code></td>
-</tr>
-<tr class="odd">
-<td><code>logs/</code></td>
-<td>(optional) runtime logs if implemented</td>
+<td><code>pipeline1:latest</code></td>
+<td>Docker image name</td>
 </tr>
 </tbody>
 </table>

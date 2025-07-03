@@ -1,1 +1,1 @@
-{"entries":[],"headings":["build-the-docker-image","project-structure","mounting-folders","run-the-pipeline","output-files","optional-helper-shell-script"]}
+{"entries":[],"headings":["what-is-pipeline2","requirements","project-structure","section","build-the-docker-image","folder-mounts-summary","run-with-default-options","full-example-with-options","dry-run-mode","output","troubleshooting","next-steps","optional-helper-shell-script"]}

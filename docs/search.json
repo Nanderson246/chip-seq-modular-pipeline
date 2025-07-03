@@ -1,5 +1,12 @@
 [
   {
+    "objectID": "Built and mount docker inside thepackage.html",
+    "href": "Built and mount docker inside thepackage.html",
+    "title": "ChIP-seq Modular Analysis Pipeline",
+    "section": "",
+    "text": "cd chip-seq-modular-pipeline docker build -f Docker/Dockerfile.pipeline1 -t pipeline1-test .\n✅ 1. Docker Command with Defaults Only\ndocker run –rm -it\n-v “\\(PWD/samples:/pipeline/samples\" \\\n  -v \"\\)PWD/Reference:/pipeline/Reference”\n-v “\\(PWD/SpikeinReference:/pipeline/SpikeinReference\" \\\n  -v \"\\)PWD/metadata:/pipeline/metadata”\n-v “\\(PWD/templates:/pipeline/templates\" \\\n  -v \"\\)PWD/adapters:/pipeline/adapters”\n-v “\\(PWD/assets:/pipeline/assets\" \\\n  -v \"\\)PWD/modules:/pipeline/modules”\n-v “\\(PWD/results:/pipeline/results\" \\\n  -v \"\\)PWD/analysis:/pipeline/analysis”\npipeline1-test bash run_pipeline1.sh This runs the pipeline with:\nTHREADS=4\nREFERENCE=hg38\nADAPTER=tn5_truseq\nPLATFORM=ILLUMINA\nMAPPING=metadata/mapping.tsv\nREPORT_FORMAT=human\n⚙️ 2. Docker Command with All Options Provided docker run –rm -it\n-v “\\(PWD/samples:/pipeline/samples\" \\\n  -v \"\\)PWD/Reference:/pipeline/Reference”\n-v “\\(PWD/SpikeinReference:/pipeline/SpikeinReference\" \\\n  -v \"\\)PWD/metadata:/pipeline/metadata”\n-v “\\(PWD/templates:/pipeline/templates\" \\\n  -v \"\\)PWD/adapters:/pipeline/adapters”\n-v “\\(PWD/assets:/pipeline/assets\" \\\n  -v \"\\)PWD/modules:/pipeline/modules”\n-v “\\(PWD/results:/pipeline/results\" \\\n  -v \"\\)PWD/analysis:/pipeline/analysis”\npipeline1-test bash run_pipeline1.sh\n-t 8\n-r mm10\n-a tn5_nextera\n-p IONTORRENT\n-m metadata/mapping.tsv\n-f csv"
+  },
+  {
     "objectID": "content/troubleshooting.html",
     "href": "content/troubleshooting.html",
     "title": "Troubleshooting",
@@ -34,7 +41,117 @@
     "href": "content/docker_pipeline2.html",
     "title": "🐳 Running Pipeline2 with Docker",
     "section": "",
-    "text": "0.1 👷‍️⛏️ 1. Build the Docker Image\nFrom the folder containing Dockerfile.pipeline2, run:\ndocker build -f Dockerfile.pipeline2 -t pipeline2-image .\n\n-f: specifies the Dockerfile to use.\n-t: tags the image name as pipeline2-image.\n.: tells Docker to build using the current directory context.\n\n\n\n\n0.2 📁 2. Project Structure\nA typical folder layout:\nyour_project/\n├── run_pipeline2.sh\n├── modules/\n│   └── pipeline2/\n├── metadata/\n├── Reference/\n├── templates/\n├── logs/\n├── analysis/           # Will be populated by the pipeline\nEnsure all these folders exist, especially Reference/, metadata/, and modules/.\n\n\n\n0.3 🗃️ 3. Mounting Folders\nTo give Docker access to your files, bind-mount these folders:\n\n\n\n\n\n\n\n\nHost Path\nDocker Path\nReason\n\n\n\n\n$PWD\n/pipeline2\nRoot of your pipeline package\n\n\n$PWD/Reference\n/pipeline2/Reference\nGenome files (FASTA, GTF, BED)\n\n\n$PWD/metadata\n/pipeline2/metadata\nSample metadata for input\n\n\n$PWD/templates\n/pipeline2/templates\nMapping schema, rules\n\n\n$PWD/logs\n/pipeline2/logs\nStore logs\n\n\n$PWD/analysis\n/pipeline2/analysis\nAll analysis results are saved here\n\n\n$PWD/assets\n/pipeline2/assets\nContains images icon for the IDR\n\n\n\n\nreport. Can be changed by user\n\n\n\n\n\n\n\n\n\n\n0.4 🏃 4. Run the Pipeline\nExample command:\ndocker run --rm \\\n  -v \"$PWD:/pipeline2\" \\\n  -v \"$PWD/Reference:/pipeline2/Reference\" \\\n  -v \"$PWD/metadata:/pipeline2/metadata\" \\\n  -v \"$PWD/templates:/pipeline2/templates\" \\\n  -v \"$PWD/logs:/pipeline2/logs\" \\\n  -v \"$PWD/analysis:/pipeline2/analysis\" \\\n  -w /pipeline2 \\\n  pipeline2-image \\\n  bash run_pipeline2.sh --caller macs3 -genome mm10\n\n\n\n0.5 📦 5. Output Files\nAfter running, the results will be in:\n\nanalysis/ — contains pipeline outputs and QC summaries\nlogs/ — contains module-specific logs\nmetadata/mapping_filtered_IDR.tsv — filtered metadata after validation\n\n\n\n\n0.6 🛠️️️ 6. Optional: Helper Shell Script\nCreate a script like run.sh:\n#!/bin/bash\ndocker run --rm \\\n  -v \"$PWD:/pipeline2\" \\\n  -v \"$PWD/Reference:/pipeline2/Reference\" \\\n  -v \"$PWD/metadata:/pipeline2/metadata\" \\\n  -v \"$PWD/templates:/pipeline2/templates\" \\\n  -v \"$PWD/logs:/pipeline2/logs\" \\\n  -v \"$PWD/analysis:/pipeline2/analysis\" \\\n  -w /pipeline2 \\\n  pipeline2-image \\\n  bash run_pipeline2.sh \"$@\"\nThen run it like this:\nchmod +x run.sh\n./run.sh --caller homer -genome mm10",
+    "text": "Pipeline2 is the second part of the ChIP-seq modular system. It performs:\n\nPeak calling (MACS3 or HOMER)\nReproducibility analysis (IDR)\nAnnotation and final reporting\n\nIt is designed to consume output from Pipeline1 (analysis/) and produce final results in results/.",
+    "crumbs": [
+      "🐳 Running Pipeline2 with Docker"
+    ]
+  },
+  {
+    "objectID": "content/docker_pipeline2.html#what-is-pipeline2",
+    "href": "content/docker_pipeline2.html#what-is-pipeline2",
+    "title": "🐳 Running Pipeline2 with Docker",
+    "section": "",
+    "text": "Pipeline2 is the second part of the ChIP-seq modular system. It performs:\n\nPeak calling (MACS3 or HOMER)\nReproducibility analysis (IDR)\nAnnotation and final reporting\n\nIt is designed to consume output from Pipeline1 (analysis/) and produce final results in results/.",
+    "crumbs": [
+      "🐳 Running Pipeline2 with Docker"
+    ]
+  },
+  {
+    "objectID": "content/docker_pipeline2.html#requirements",
+    "href": "content/docker_pipeline2.html#requirements",
+    "title": "🐳 Running Pipeline2 with Docker",
+    "section": "2 ✅ Requirements",
+    "text": "2 ✅ Requirements\n\nDocker installed (docker --version)\nPipeline image built (see below)\nDirectory structure including:\n\n\nReference/         # Genome references\nmetadata/          # Sample and group mapping\ntemplates/         # Configuration files\nanalysis/          # Output from pipeline1\nresults/           # New output\ntools/, assets/    # Utility scripts and helper data\nmodules/           # Contains pipeline2 logic\n\n\n\n2.1 📁 2. Project Structure\nA typical folder layout:\nyour_project/\n├── run_pipeline2.sh\n├── modules/\n│   └── pipeline2/\n├── metadata/\n├── Reference/\n├── templates/\n├── logs/\n├── analysis/           # Will be populated by the pipeline\nEnsure all these folders exist, especially Reference/, metadata/, and modules/.",
+    "crumbs": [
+      "🐳 Running Pipeline2 with Docker"
+    ]
+  },
+  {
+    "objectID": "content/docker_pipeline2.html#section",
+    "href": "content/docker_pipeline2.html#section",
+    "title": "🐳 Running Pipeline2 with Docker",
+    "section": "3 ————————————————————————",
+    "text": "3 ————————————————————————",
+    "crumbs": [
+      "🐳 Running Pipeline2 with Docker"
+    ]
+  },
+  {
+    "objectID": "content/docker_pipeline2.html#build-the-docker-image",
+    "href": "content/docker_pipeline2.html#build-the-docker-image",
+    "title": "🐳 Running Pipeline2 with Docker",
+    "section": "4 🏗️ Build the Docker Image",
+    "text": "4 🏗️ Build the Docker Image\nFrom your project root:\ndocker build -f Docker/Dockerfile.pipeline2 -t pipeline2-test .\nThis command builds a Docker image using your latest Dockerfile.pipeline2.",
+    "crumbs": [
+      "🐳 Running Pipeline2 with Docker"
+    ]
+  },
+  {
+    "objectID": "content/docker_pipeline2.html#folder-mounts-summary",
+    "href": "content/docker_pipeline2.html#folder-mounts-summary",
+    "title": "🐳 Running Pipeline2 with Docker",
+    "section": "5 📁 Folder Mounts Summary",
+    "text": "5 📁 Folder Mounts Summary\n\n\n\nHost Folder\nContainer Path\nPurpose\n\n\n\n\nanalysis/\n/data/analysis\nInput from pipeline1\n\n\nresults/\n/data/results\nOutput from pipeline2\n\n\nReference/\n/data/Reference\nGenome references\n\n\nmetadata/\n/data/metadata\nMetadata and mapping\n\n\ntemplates/\n/data/templates\nPipeline configuration\n\n\nmodules/\n/data/modules\nContains pipeline2 logic\n\n\nassets/\n/data/assets\nVisual assets and icons\n\n\ntools/\n/pipeline/tools\nCustom scripts and binaries",
+    "crumbs": [
+      "🐳 Running Pipeline2 with Docker"
+    ]
+  },
+  {
+    "objectID": "content/docker_pipeline2.html#run-with-default-options",
+    "href": "content/docker_pipeline2.html#run-with-default-options",
+    "title": "🐳 Running Pipeline2 with Docker",
+    "section": "6 ▶️ Run With Default Options",
+    "text": "6 ▶️ Run With Default Options\ndocker run --rm -it \\\n  -v \"$PWD/analysis:/data/analysis\" \\\n  -v \"$PWD/results:/data/results\" \\\n  -v \"$PWD/Reference:/data/Reference\" \\\n  -v \"$PWD/metadata:/data/metadata\" \\\n  -v \"$PWD/templates:/data/templates\" \\\n  -v \"$PWD/modules:/data/modules\" \\\n  -v \"$PWD/assets:/data/assets\" \\\n  -v \"$PWD/tools:/pipeline/tools\" \\\n  pipeline2-test \\\n  bash run_pipeline2.sh --caller homer --genome hg38",
+    "crumbs": [
+      "🐳 Running Pipeline2 with Docker"
+    ]
+  },
+  {
+    "objectID": "content/docker_pipeline2.html#full-example-with-options",
+    "href": "content/docker_pipeline2.html#full-example-with-options",
+    "title": "🐳 Running Pipeline2 with Docker",
+    "section": "7 ⚙️ Full Example With Options",
+    "text": "7 ⚙️ Full Example With Options\ndocker run --rm -it \\\n  -v \"$PWD/analysis:/data/analysis\" \\\n  -v \"$PWD/results:/data/results\" \\\n  -v \"$PWD/Reference:/data/Reference\" \\\n  -v \"$PWD/metadata:/data/metadata\" \\\n  -v \"$PWD/templates:/data/templates\" \\\n  -v \"$PWD/modules:/data/modules\" \\\n  -v \"$PWD/assets:/data/assets\" \\\n  -v \"$PWD/tools:/pipeline/tools\" \\\n  pipeline2-test \\\n  bash run_pipeline2.sh \\\n    --caller macs3 \\\n    --genome mm10 \\\n    -t 8 \\\n    -m metadata/mapping.tsv \\\n    -f true \\\n    -c spearman\n\n✅ --caller: choose macs3 or homer ✅ -t: number of threads ✅ -f: filtering enabled (true/false) ✅ -c: correlation method",
+    "crumbs": [
+      "🐳 Running Pipeline2 with Docker"
+    ]
+  },
+  {
+    "objectID": "content/docker_pipeline2.html#dry-run-mode",
+    "href": "content/docker_pipeline2.html#dry-run-mode",
+    "title": "🐳 Running Pipeline2 with Docker",
+    "section": "8 🔍 Dry Run Mode",
+    "text": "8 🔍 Dry Run Mode\nIf your pipeline supports --dry-run, test like this:\nbash run_pipeline2.sh --caller homer --dry-run\nInside Docker:\ndocker run --rm -it pipeline2-test\ncd /pipeline && bash run_pipeline2.sh --dry-run",
+    "crumbs": [
+      "🐳 Running Pipeline2 with Docker"
+    ]
+  },
+  {
+    "objectID": "content/docker_pipeline2.html#output",
+    "href": "content/docker_pipeline2.html#output",
+    "title": "🐳 Running Pipeline2 with Docker",
+    "section": "9 📂 Output",
+    "text": "9 📂 Output\n\n\n\nFolder\nDescription\n\n\n\n\nresults/\nFinal peak files, reports, plots\n\n\nanalysis/\nUsed from pipeline1 as source input\n\n\nlogs/\nPer-module logs (optional, if implemented)",
+    "crumbs": [
+      "🐳 Running Pipeline2 with Docker"
+    ]
+  },
+  {
+    "objectID": "content/docker_pipeline2.html#troubleshooting",
+    "href": "content/docker_pipeline2.html#troubleshooting",
+    "title": "🐳 Running Pipeline2 with Docker",
+    "section": "10 🧼 Troubleshooting",
+    "text": "10 🧼 Troubleshooting\n\nMake sure your Docker mounts point to actual directories (ls to verify).\nTry running Docker without volumes first to debug logic:\ndocker run --rm -it pipeline2-test\nbash run_pipeline2.sh --caller homer",
+    "crumbs": [
+      "🐳 Running Pipeline2 with Docker"
+    ]
+  },
+  {
+    "objectID": "content/docker_pipeline2.html#next-steps",
+    "href": "content/docker_pipeline2.html#next-steps",
+    "title": "🐳 Running Pipeline2 with Docker",
+    "section": "11 ✅ Next Steps",
+    "text": "11 ✅ Next Steps\nYou can now:\n\nValidate outputs in results/\nView filtered metadata in metadata/mapping_filtered.tsv\nOptionally generate a downstream report or visualizations\n\n\n\n11.1 🛠️️️ 6. Optional: Helper Shell Script\nCreate a script like run.sh:\n#!/bin/bash\ndocker run --rm -it \\\n  -v \"$PWD/analysis:/data/analysis\" \\\n  -v \"$PWD/results:/data/results\" \\\n  -v \"$PWD/Reference:/data/Reference\" \\\n  -v \"$PWD/metadata:/data/metadata\" \\\n  -v \"$PWD/templates:/data/templates\" \\\n  -v \"$PWD/modules:/data/modules\" \\\n  -v \"$PWD/assets:/data/assets\" \\\n  -v \"$PWD/tools:/pipeline/tools\" \\\n  pipeline2-test \\\n  bash run_pipeline2.sh \"$@\"\nThen run it like this:\nchmod +x run.sh\n./run.sh --caller homer -genome mm10",
     "crumbs": [
       "🐳 Running Pipeline2 with Docker"
     ]
@@ -200,21 +317,108 @@
     ]
   },
   {
+    "objectID": "docker1_table.html",
+    "href": "docker1_table.html",
+    "title": "ChIP-seq Modular Analysis Pipeline",
+    "section": "",
+    "text": "0.1 📝 Explanation\n\n\n\n\n\n\n\nOption\nDescription\n\n\n\n\n--rm\nRemoves container after run\n\n\n-v &lt;host&gt;:&lt;container&gt;\nMounts folders into container\n\n\n-t 4\nNumber of threads\n\n\n-r mm10\nReference genome (hg38, mm10, etc.)\n\n\n-a tn5_truseq\nAdapter type (should match what’s in your pipeline)\n\n\npipeline1:latest\nDocker image name"
+  },
+  {
     "objectID": "content/docker_pipeline1.html",
     "href": "content/docker_pipeline1.html",
     "title": "🐳 Running Pipeline1 with Docker",
     "section": "",
-    "text": "🐳 Docker Usage Guide\nThis guide explains how to build and run the ChIP-seq processing pipeline using Docker. It is designed for users at all levels, including beginners.\nWhile the original pipeline was created to work directly in Host-based installation, the pipeline can be used with docker containers and mounting the required folder needed for the package This pipeline is fully containerized and can be run with a single Docker command. Below is the recommended usage to preserve outputs, access your own data, and avoid re-downloading references.\n\n\n\n\nDocker installed and working (docker --version)\nYour working directory should contain:\n\nReference/ — genome files (e.g. hg38, mm10, etc.)\nmetadata/ — sample sheet (SRR_Acc_List.txt, etc.)\nsamples/ — (optional) pre-existing FASTQs\nresults/ — (created if missing) final output goes here\nlogs/ — (created if missing) all logs go here\n\n\n\n\n\n\ndocker run --rm \\\n  -v \"$PWD/Reference\":/pipeline/Reference \\\n  -v \"$PWD/SpikeinReference\":/pipeline/SpikeinReference \\\n  -v \"$PWD/metadata\":/pipeline/metadata \\\n  -v \"$PWD/samples\":/pipeline/samples \\\n  -v \"$PWD/results\":/pipeline/results \\\n  -v \"$PWD/logs\":/pipeline/logs \\\n  -v \"$PWD/logs\":/pipeline/assets \\\n  pipeline1:latest -t 4 -r mm10 -a tn5_truseq\n\n\n\n\n\n\n\n\n\n\n\nOption\nDescription\n\n\n\n\n--rm\nRemoves container after run\n\n\n-v &lt;host&gt;:&lt;container&gt;\nMounts folders into container\n\n\n-t 4\nNumber of threads\n\n\n-r mm10\nReference genome (hg38, mm10, etc.)\n\n\n-a tn5_truseq\nAdapter type (should match what’s in your pipeline)\n\n\npipeline1:latest\nDocker image name\n\n\n\n\n\n\n\nAll outputs go into your local results/ and logs/ folders — no data is lost after the container exits.",
+    "text": "This guide explains how to build and run the pipeline1 container for the ChIP-seq Modular Analysis Pipeline using Docker. It is beginner-friendly and reproducible.",
     "crumbs": [
       "🐳 Running Pipeline1 with Docker"
     ]
   },
   {
-    "objectID": "content/docker_pipeline1.html#running-pipeline1-with-docker",
-    "href": "content/docker_pipeline1.html#running-pipeline1-with-docker",
+    "objectID": "content/docker_pipeline1.html#what-is-this",
+    "href": "content/docker_pipeline1.html#what-is-this",
     "title": "🐳 Running Pipeline1 with Docker",
     "section": "",
-    "text": "🐳 Docker Usage Guide\nThis guide explains how to build and run the ChIP-seq processing pipeline using Docker. It is designed for users at all levels, including beginners.\nWhile the original pipeline was created to work directly in Host-based installation, the pipeline can be used with docker containers and mounting the required folder needed for the package This pipeline is fully containerized and can be run with a single Docker command. Below is the recommended usage to preserve outputs, access your own data, and avoid re-downloading references.\n\n\n\n\nDocker installed and working (docker --version)\nYour working directory should contain:\n\nReference/ — genome files (e.g. hg38, mm10, etc.)\nmetadata/ — sample sheet (SRR_Acc_List.txt, etc.)\nsamples/ — (optional) pre-existing FASTQs\nresults/ — (created if missing) final output goes here\nlogs/ — (created if missing) all logs go here\n\n\n\n\n\n\ndocker run --rm \\\n  -v \"$PWD/Reference\":/pipeline/Reference \\\n  -v \"$PWD/SpikeinReference\":/pipeline/SpikeinReference \\\n  -v \"$PWD/metadata\":/pipeline/metadata \\\n  -v \"$PWD/samples\":/pipeline/samples \\\n  -v \"$PWD/results\":/pipeline/results \\\n  -v \"$PWD/logs\":/pipeline/logs \\\n  -v \"$PWD/logs\":/pipeline/assets \\\n  pipeline1:latest -t 4 -r mm10 -a tn5_truseq\n\n\n\n\n\n\n\n\n\n\n\nOption\nDescription\n\n\n\n\n--rm\nRemoves container after run\n\n\n-v &lt;host&gt;:&lt;container&gt;\nMounts folders into container\n\n\n-t 4\nNumber of threads\n\n\n-r mm10\nReference genome (hg38, mm10, etc.)\n\n\n-a tn5_truseq\nAdapter type (should match what’s in your pipeline)\n\n\npipeline1:latest\nDocker image name\n\n\n\n\n\n\n\nAll outputs go into your local results/ and logs/ folders — no data is lost after the container exits.",
+    "text": "This guide explains how to build and run the pipeline1 container for the ChIP-seq Modular Analysis Pipeline using Docker. It is beginner-friendly and reproducible.",
+    "crumbs": [
+      "🐳 Running Pipeline1 with Docker"
+    ]
+  },
+  {
+    "objectID": "content/docker_pipeline1.html#prerequisites",
+    "href": "content/docker_pipeline1.html#prerequisites",
+    "title": "🐳 Running Pipeline1 with Docker",
+    "section": "2 ✅ Prerequisites",
+    "text": "2 ✅ Prerequisites\nMake sure you have:\n\nDocker installed\nA terminal open in the project root (chip-seq-modular-pipeline/)",
+    "crumbs": [
+      "🐳 Running Pipeline1 with Docker"
+    ]
+  },
+  {
+    "objectID": "content/docker_pipeline1.html#step-1-build-the-docker-image",
+    "href": "content/docker_pipeline1.html#step-1-build-the-docker-image",
+    "title": "🐳 Running Pipeline1 with Docker",
+    "section": "3 🏗️ Step 1: Build the Docker Image",
+    "text": "3 🏗️ Step 1: Build the Docker Image\nFrom the project root, run:\ndocker build -f Docker/Dockerfile.pipeline1 -t pipeline1-test .\nWhere:\n\n-f tells Docker which file to use\n-t pipeline1-test names the image\n. sets the build context (your entire repo)\n\n\n⏱️ First-time builds may take several minutes.",
+    "crumbs": [
+      "🐳 Running Pipeline1 with Docker"
+    ]
+  },
+  {
+    "objectID": "content/docker_pipeline1.html#step-2-folder-structure",
+    "href": "content/docker_pipeline1.html#step-2-folder-structure",
+    "title": "🐳 Running Pipeline1 with Docker",
+    "section": "4 📁 Step 2: Folder Structure",
+    "text": "4 📁 Step 2: Folder Structure\nTo ensure correct volume mounting inside the container, organize your folders like this:\n\n\n\n\n\n\n\n\nHost Folder\nContainer Mount\nDescription\n\n\n\n\nsamples/\n/pipeline/samples\nRaw sequencing input\n\n\nReference/\n/pipeline/Reference\nGenome reference files\n\n\nSpikeinReference/\n/pipeline/SpikeinReference\nSpike-in configs\n\n\nmetadata/\n/pipeline/metadata\nSample metadata and mapping files\n\n\ntemplates/\n/pipeline/templates\nYAML/TSV configuration templates\n\n\nadapters/\n/pipeline/adapters\nAdapter files for trimming\n\n\nassets/\n/pipeline/assets\nIcons, logos, images, PDFs, etc.\n\n\nmodules/\n/pipeline/modules\nPipeline logic and scripts\n\n\nresults/\n/pipeline/results\nOutput from pipeline1\n\n\nanalysis/\n/pipeline/analysis\nOutput passed to pipeline2\n\n\n\n\n🛠️ Docker will auto-create results/ and analysis/ if they don’t exist.",
+    "crumbs": [
+      "🐳 Running Pipeline1 with Docker"
+    ]
+  },
+  {
+    "objectID": "content/docker_pipeline1.html#step-3-run-the-pipeline-default",
+    "href": "content/docker_pipeline1.html#step-3-run-the-pipeline-default",
+    "title": "🐳 Running Pipeline1 with Docker",
+    "section": "5 ▶️ Step 3: Run the Pipeline (Default)",
+    "text": "5 ▶️ Step 3: Run the Pipeline (Default)\nTo run the default pipeline with standard parameters:\ndocker run --rm -it \\\n  -v \"$PWD/samples:/pipeline/samples\" \\\n  -v \"$PWD/Reference:/pipeline/Reference\" \\\n  -v \"$PWD/SpikeinReference:/pipeline/SpikeinReference\" \\\n  -v \"$PWD/metadata:/pipeline/metadata\" \\\n  -v \"$PWD/templates:/pipeline/templates\" \\\n  -v \"$PWD/adapters:/pipeline/adapters\" \\\n  -v \"$PWD/assets:/pipeline/assets\" \\\n  -v \"$PWD/modules:/pipeline/modules\" \\\n  -v \"$PWD/results:/pipeline/results\" \\\n  -v \"$PWD/analysis:/pipeline/analysis\" \\\n  pipeline1-test bash run_pipeline1.sh",
+    "crumbs": [
+      "🐳 Running Pipeline1 with Docker"
+    ]
+  },
+  {
+    "objectID": "content/docker_pipeline1.html#step-4-run-with-custom-options",
+    "href": "content/docker_pipeline1.html#step-4-run-with-custom-options",
+    "title": "🐳 Running Pipeline1 with Docker",
+    "section": "6 ⚙️ Step 4: Run with Custom Options",
+    "text": "6 ⚙️ Step 4: Run with Custom Options\nExample with flags for genome, adapter, platform, and threads:\ndocker run --rm -it \\\n  -v \"$PWD/samples:/pipeline/samples\" \\\n  -v \"$PWD/Reference:/pipeline/Reference\" \\\n  -v \"$PWD/SpikeinReference:/pipeline/SpikeinReference\" \\\n  -v \"$PWD/metadata:/pipeline/metadata\" \\\n  -v \"$PWD/templates:/pipeline/templates\" \\\n  -v \"$PWD/adapters:/pipeline/adapters\" \\\n  -v \"$PWD/assets:/pipeline/assets\" \\\n  -v \"$PWD/modules:/pipeline/modules\" \\\n  -v \"$PWD/results:/pipeline/results\" \\\n  -v \"$PWD/analysis:/pipeline/analysis\" \\\n  pipeline1-test bash run_pipeline1.sh \\\n    -t 8 \\\n    -r mm10 \\\n    -a tn5_nextera \\\n    -p IONTORRENT \\\n    -m metadata/mapping.tsv \\\n    -f csv",
+    "crumbs": [
+      "🐳 Running Pipeline1 with Docker"
+    ]
+  },
+  {
+    "objectID": "content/docker_pipeline1.html#troubleshooting-tips",
+    "href": "content/docker_pipeline1.html#troubleshooting-tips",
+    "title": "🐳 Running Pipeline1 with Docker",
+    "section": "7 🪛 Troubleshooting & Tips",
+    "text": "7 🪛 Troubleshooting & Tips\n\n✅ Run Docker inside your project folder.\n✅ Mount results/ and analysis/ to keep output.\n🐞 To debug interactively:\n\ndocker run --rm -it pipeline1-test\nThen inside the container:\nbash run_pipeline1.sh -t 4 -r hg38",
+    "crumbs": [
+      "🐳 Running Pipeline1 with Docker"
+    ]
+  },
+  {
+    "objectID": "content/docker_pipeline1.html#next-steps",
+    "href": "content/docker_pipeline1.html#next-steps",
+    "title": "🐳 Running Pipeline1 with Docker",
+    "section": "8 🎯 Next Steps",
+    "text": "8 🎯 Next Steps\nOnce pipeline1 finishes, you can move to pipeline2 using analysis/ as input.",
+    "crumbs": [
+      "🐳 Running Pipeline1 with Docker"
+    ]
+  },
+  {
+    "objectID": "content/docker_pipeline1.html#output-overview",
+    "href": "content/docker_pipeline1.html#output-overview",
+    "title": "🐳 Running Pipeline1 with Docker",
+    "section": "9 📂 Output Overview",
+    "text": "9 📂 Output Overview\n\n\n\nFolder\nDescription\n\n\n\n\nresults/\nOutput results from pipeline1\n\n\nanalysis/\nUsed later as input for pipeline2\n\n\nlogs/\n(optional) runtime logs if implemented",
     "crumbs": [
       "🐳 Running Pipeline1 with Docker"
     ]
@@ -358,5 +562,159 @@
     "crumbs": [
       "🐍 Core enviroment:conda"
     ]
+  },
+  {
+    "objectID": "wiki_combined.html#sections",
+    "href": "wiki_combined.html#sections",
+    "title": "ChIP-seq Modular Analysis Pipeline",
+    "section": "2.1 📚 Sections",
+    "text": "2.1 📚 Sections\n\nOverview\nPipeline 1: QC & Preprocessing\nPipeline 2: Peak Calling & Analysis\nMetadata Guide\nDocker Usage - Pipeline 1\nDocker Usage - Pipeline 2\nUnified Docker Guide\nConda Environment Setup\nSoftware Requirements\nTroubleshooting\nCitations\nLicense"
+  },
+  {
+    "objectID": "wiki_combined.html#quick-start",
+    "href": "wiki_combined.html#quick-start",
+    "title": "ChIP-seq Modular Analysis Pipeline",
+    "section": "2.2 🧪 Quick Start",
+    "text": "2.2 🧪 Quick Start\nIf you’re eager to run the pipeline quickly, jump to:\n👉 Quick Start Guide\nOr explore the Docker options for portable setup:\n👉 Docker Setup"
+  },
+  {
+    "objectID": "wiki_combined.html#overview-1",
+    "href": "wiki_combined.html#overview-1",
+    "title": "ChIP-seq Modular Analysis Pipeline",
+    "section": "3.1 🧬 Overview",
+    "text": "3.1 🧬 Overview\nThis pipeline was developed and tested on Linux with POSIX-compliant behavior, macOS compatibility is not supported, If adjustments are needed for your system, you are free to modify the setup accordingly. This is the first version and still in beta test. However you can download and tested in your system as full package or use every modular script. The goal was to create a first Github project to establish Bioinformatic competence by the author.\nThis project implements a modular and reproducible ChIP-seq analysis pipeline designed for both human and mouse samples. The pipeline is organized into two main parts:\n\nPreprocessing and BAM Cleaning – Modular pipeline for data preparation.\nPeak Calling and Reproducibility Analysis – Peak detection, quality control, and IDR-based reproducibility assessment.\n\nThe pipeline supports both HOMER and MACS3 workflows, and uses metadata-based automation. Its structure mirrors the ENCODE ChIP-seq processing pipeline, providing a modular, standardized workflow to produce reproducible peak calls, generate signal tracks, and perform quality assessments such as IDR (Irreproducible Discovery Rate), while automating sample naming and grouping.\nThis package is intended to be flexible and modular. Each module can be customized by the user, or the pipeline can be run as-is. It is not a beginner-friendly pipeline, nor was it designed to be. The pipeline runs directly in Bash on a Linux system. Docker files are included to allow execution within containers, and a brief guide is provided at the end of this text, explaining how to build the container and mount the required folders properly.\nTo run this pipeline you will need to have your paired fastq.gz samples in the samples folder, a mapping.tsv data, and to set the reference files in the Reference folder and the spike reference genomes in the SpikeinReference folder.\nThe package provide two dataset test from GEO dataset to test Hg38 and mm10 samples.\nInformation about these two GEO datasets is provided in the README.md file inside the examples/ folder. The pipeline1 is adapted to automatically download an SRR_Acc_List.txt if the list in the metadata folder. We also provide the mapping.tsv as example"
+  },
+  {
+    "objectID": "wiki_combined.html#pipeline-components",
+    "href": "wiki_combined.html#pipeline-components",
+    "title": "ChIP-seq Modular Analysis Pipeline",
+    "section": "3.2 📚 Pipeline Components",
+    "text": "3.2 📚 Pipeline Components\n\n3.2.1 🔧 1. Read Preprocessing and Alignment\nInput: FASTQ files (reads)\nTools Used:\n\ncutadapt: Adapter trimming\nBWA: Alignment to reference genome\nSamtools, Picard: Sorting, deduplication, indexing, BAM cleanup\n\nOutputs:\n\nUnfiltered alignments\nFiltered, deduplicated BAM files\nRemoval of excluded/blacklisted regions (e.g., ENCODE blacklist)"
+  },
+  {
+    "objectID": "wiki_combined.html#replicate-quality-control-with-deeptools",
+    "href": "wiki_combined.html#replicate-quality-control-with-deeptools",
+    "title": "ChIP-seq Modular Analysis Pipeline",
+    "section": "3.3 🔬 Replicate Quality Control with deepTools",
+    "text": "3.3 🔬 Replicate Quality Control with deepTools\nThis pipeline uses deepTools (e.g., plotFingerprint, multiBamSummary) to evaluate replicate quality.\n\n3.3.1 ✅ Advantages of deepTools:\n\n🧪 Modern and actively maintained – compatible with recent Python environments\n📊 Fingerprint and cross-correlation plots – assess ChIP enrichment and background\n⚙️ Format flexibility – supports BAM and BigWig\n🐳 Container-friendly – easy to integrate in Docker-based workflows\n📁 Multi-sample analysis – supports multiBamSummary, plotCorrelation\n\nUsers can optionally replace this with Relative Strand Correlation (RSC) via the ChIPQC R package by editing the relevant module — showcasing the pipeline’s modularity.\n\n\n3.3.2 ❓ Why not use phantompeakqualtools?\nAlthough once widely used to assess replicate quality, phantompeakqualtools is now:\n\n🛑 Outdated and no longer actively maintained\n🐪 Depends on legacy Perl environments and outdated tools like CClang v5\n🧱 Hard to containerize or integrate into modern pipelines\n\nTherefore, it has been replaced by more maintainable alternatives in this workflow.\n\n\n3.3.3 📈 2. Signal Generation\nTools:\n\nMACS3: Generates signal tracks (bedGraph or bigWig)\nBEDTools: For further manipulation\n\nOutputs:\n\nSignal p-value tracks\nFold change over control tracks\n\n\n\n3.3.4 📍 3. Peak Calling\nPerformed on:\n\nIndividual replicates\nPooled replicates\nPseudoreplicates\n\nTools:\n\nMACS3 or HOMER\n\nOutputs:\n\nReplicated peaks\nPooled peaks\nPseudoreplicated peaks\n\n\n\n3.3.5 📊 4. IDR Analysis\nTool: idr — used to assess peak reproducibility\nThis pipeline uses a patched IDR version compatible with the latest numpy, avoiding the need to downgrade.\n\n\n3.3.6 🛠 Patch + Install IDR (NumPy Compatibility)\nbash\n    wget https://github.com/kundajelab/idr/archive/refs/tags/2.0.4.2.tar.gz && \\\n    tar -xvf 2.0.4.2.tar.gz && \\\n    cd idr-2.0.4.2/idr && \\\n    sed -i 's/numpy.int/int/g' idr.py && \\\n    cd .. && \\\n    pip install . --break-system-packages && \\\n    rm -rf /opt/idr-2.0.4.2 /opt/2.0.4.2.tar.gz\nOutputs:\n\nIDR-ranked peaks\nIDR-thresholded peaks\nConservative IDR peaks\n\n\n\n3.3.7 🔁 5. Replicate/Partition Concordance\nAssesses consistency of peaks across replicates and pseudoreplicates.\n\n\n3.3.8 🧾 6. Format Conversion and Final Outputs\nCovers conversion to final formats for visualization, downstream analysis, or submission."
+  },
+  {
+    "objectID": "wiki_combined.html#installation-overview",
+    "href": "wiki_combined.html#installation-overview",
+    "title": "ChIP-seq Modular Analysis Pipeline",
+    "section": "4.1 📦 Installation Overview",
+    "text": "4.1 📦 Installation Overview\nThis guide explains how to set up the ChIP-seq Modular Analysis Pipeline using:\n\n✅ Git clone (recommended)\n📁 .tar.gz or .zip archive download\n🐳 Docker (see Docker Guide)\n🧪 Conda environments (see Conda Setup)"
+  },
+  {
+    "objectID": "wiki_combined.html#option-1-clone-from-github",
+    "href": "wiki_combined.html#option-1-clone-from-github",
+    "title": "ChIP-seq Modular Analysis Pipeline",
+    "section": "4.2 📂 Option 1: Clone from GitHub",
+    "text": "4.2 📂 Option 1: Clone from GitHub\nThe most robust and update-safe method:\ngit clone https://github.com/your-username/your-repo.git\ncd your-repo\n\n4.2.1 ✅ Make Scripts Executable (already github executable commit, but in case)\nchmod +x run_pipeline*.sh\nchmod +x modules/**/*.sh\nchmod +x modules/**/*.py\nchmod +x modules/**/*.R"
+  },
+  {
+    "objectID": "wiki_combined.html#option-2-download-archive",
+    "href": "wiki_combined.html#option-2-download-archive",
+    "title": "ChIP-seq Modular Analysis Pipeline",
+    "section": "4.3 📦 Option 2: Download Archive",
+    "text": "4.3 📦 Option 2: Download Archive\n\n4.3.1 🔸 If you downloaded the .tar.gz version:\ntar -xzvf your-pipeline.tar.gz\ncd your-pipeline\nScripts remain executable — no chmod needed.\n\n\n4.3.2 ⚠️ If you downloaded the .zip version:\nunzip your-pipeline.zip\ncd your-pipeline\nThen run:\nchmod +x run_pipeline*.sh\nchmod +x modules/**/*.sh\nchmod +x modules/**/*.py\nchmod +x modules/**/*.R"
+  },
+  {
+    "objectID": "wiki_combined.html#test-the-installation",
+    "href": "wiki_combined.html#test-the-installation",
+    "title": "ChIP-seq Modular Analysis Pipeline",
+    "section": "4.4 ✅ Test the Installation",
+    "text": "4.4 ✅ Test the Installation\nMake sure the scripts work:\n./run_pipeline1.sh --help\n./run_pipeline2.sh --help"
+  },
+  {
+    "objectID": "wiki_combined.html#expected-file-structure",
+    "href": "wiki_combined.html#expected-file-structure",
+    "title": "ChIP-seq Modular Analysis Pipeline",
+    "section": "4.5 📁 Expected File Structure",
+    "text": "4.5 📁 Expected File Structure\nyour-repo/\n├── run_pipeline1.sh\n├── run_pipeline2.sh\n├── modules/\n│   └── pipeline1/\n│   └── pipeline2/\n│   └── utils/\n├── metadata/\n├── Reference/\n├── analysis/\n└── ..."
+  },
+  {
+    "objectID": "wiki_combined.html#related-setup-pages",
+    "href": "wiki_combined.html#related-setup-pages",
+    "title": "ChIP-seq Modular Analysis Pipeline",
+    "section": "4.6 📚 Related Setup Pages",
+    "text": "4.6 📚 Related Setup Pages\n\n📦 Reference Setup\n🧬 Metadata & Mapping Format\n🔧 Software Requirements\n🐳 Docker Setup\n🧪 Conda Environment"
+  },
+  {
+    "objectID": "wiki_combined.html#notes",
+    "href": "wiki_combined.html#notes",
+    "title": "ChIP-seq Modular Analysis Pipeline",
+    "section": "4.7 📝 Notes",
+    "text": "4.7 📝 Notes\nIf you encounter permission errors or missing dependencies, refer to Troubleshooting.\n\n\nLet me know if you want to include a section for installing a local Conda environment (`environment.yml`) or a helper `install.sh`."
+  },
+  {
+    "objectID": "wiki_combined.html#pipeline-1-qc-preprocessing-modules",
+    "href": "wiki_combined.html#pipeline-1-qc-preprocessing-modules",
+    "title": "ChIP-seq Modular Analysis Pipeline",
+    "section": "6.1 🔄 Pipeline 1: QC & Preprocessing Modules",
+    "text": "6.1 🔄 Pipeline 1: QC & Preprocessing Modules"
+  },
+  {
+    "objectID": "wiki_combined.html#supported-data-types",
+    "href": "wiki_combined.html#supported-data-types",
+    "title": "ChIP-seq Modular Analysis Pipeline",
+    "section": "6.2 🧬 Supported Data Types",
+    "text": "6.2 🧬 Supported Data Types\nThis pipeline is designed for ChIP-seq and ATAC-seq data preprocessing. It includes:\n\nAdapter trimming (cutadapt)\nParallel quality control (FastQC)\nOptional spike-in filtering\nMitochondrial read removal\nBlacklist region filtering (ENCODE)\nClean alignment with BWA and BAM post-processing\n\nBy supporting these steps, the pipeline ensures high-quality, reproducible inputs for downstream peak calling or chromatin accessibility analysis.\n\n🔁 While optimized for ChIP-seq, the pipeline is fully compatible with ATAC-seq experiments.\n\nScripts: 01_init_directories.sh to 11_Renaming_bam.sh\nmodules/pipeline1\\$ tree . \n├── 01_init_directories.sh \n├── 02_reference_check.sh \n├── 03_input_fetch.sh \n├── 04_fastqc_parallel.sh \n├── 05_05_Cutadapt_trimming_phix_parallel.sh \n├── 06_fastqc_trimmed_parallel.sh \n├── 07_spike_detect.sh \n├── 08_alignment_bwa_spike.sh \n├── 09_readgroups_add.sh \n├── 10_bam_cleaning.sh \n├── 10_plot_spike_qc_summary.R \n└── 11_Renaming_bam.sh\nGreat structure! Given the flow of your Quarto document, the best place to add the usage documentation for run_pipeline1.sh would be after the ## 🧬 Supported Data Types section and before the ### 🔧 Modules section.\nThis keeps your document logically organized:\n\nIntro\nWhat data it supports\nHow to run it (Usage) ✅\nWhat each module does\nWhat the outputs are\n\n\n6.2.1 ✅ Suggested Update (add this block in your .qmd file):\n### 🚀 Usage: `run_pipeline1.sh`\n\nThis script is the entry point for Pipeline 1 and supports both default and customized executions.\n\n#### ✅ Default Run\n\nRun with all defaults:\n```bash\nbash run_pipeline1.sh\nThis uses:\n\nTHREADS = 4\nREFERENCE = hg38\nADAPTER = tn5_truseq\nPLATFORM = ILLUMINA\nMAPPING = metadata/mapping.tsv\nREPORT_FORMAT = human\n\n\n6.2.1.1 🔧 Full Custom Run\nExample of overriding all defaults:\nbash run_pipeline1.sh -t 8 -r mm10 -a tn5_nextera -p IONTORRENT -m data/sample_metadata.tsv -f csv\nOverrides:\n\n-t 8: 8 threads\n-r mm10: mouse genome\n-a tn5_nextera: alternative adapter\n-p IONTORRENT: sequencing platform\n-m data/sample_metadata.tsv: custom mapping file\n-f csv: report format\n\n\n\n6.2.1.2 ℹ️ Help\nFor option details:\nbash run_pipeline1.sh --help\n\n\n\n6.2.2 🔧 Modules\n\n🔧 Modules Overview\n\n\nScript\nPurpose\n\n\n\n\n01_init_directories.sh\nCreates necessary directory structure.\n\n\n02_reference_check.sh\nValidates presence of genome reference files.\n\n\n03_input_fetch.sh\nFetches and decompresses user-supplied FASTQ files.\n\n\n04_fastqc_parallel.sh\nRuns FastQC and generates quality reports.\n\n\n05_Cutadapt_trimming_phix_parallel.sh\nTrims adapters and low-quality bases using Cutadapt.\n\n\n06_fastqc_trimmed_parallel.sh\nRuns FastQC on trimmed reads.\n\n\n07_spike_detect.sh\nDetects exogenous spike-in if not provided.\n\n\n08_alignment_bwa_spike.sh\nAligns reads using BWA and checks spike content.\n\n\n09_readgroups_add.sh\nAdds read group metadata using Picard.\n\n\n10_bam_cleaning.sh\nCleans and indexes BAMs; performs spike-in QC.\n\n\n11_Renaming_bam.sh\nRenames BAMs using mapping.tsv for grouping.\n\n\n\n\n\n6.2.3 📁 Output Folders\nresults/: Raw outputs and intermediate files.\nanalysis/Renamed_Cleaned: Cleaned and filtered BAMs for downstream usage.\nresults/\nresults/Filtered$ tree \n\n├── BAM}\n├── Filtered\n├        ├── Cleaned  ✅ here are the cleaned BAM that will be renamed. │\n├        ├── Deduplicated\n├        └── Metrics\n├── QC_fastqc\n├── QC_spike_plots\n├── QC_trimmed_fastqc\n├── spike_analysis\n└── Trimmed"
+  },
+  {
+    "objectID": "wiki_combined.html#functional-enrichment-report",
+    "href": "wiki_combined.html#functional-enrichment-report",
+    "title": "ChIP-seq Modular Analysis Pipeline",
+    "section": "7.1 🧬 Functional Enrichment Report",
+    "text": "7.1 🧬 Functional Enrichment Report\nThe final enrichment summary report (including Gene Ontology, KEGG, Reactome, and g:Profiler figures) is available as a downloadable PDF and HTML. If the PRE_POSSIBLE_OUTCOME.tsv file is too large, the PDF will include only the g:Profiler figures. The full PRE_POSSIBLE_OUTCOME.tsv content will remain available in its original TSV format and within the HTML report.\n\n7.1.1 📎 Example Reports\n👉 hg38: 📎 View report (PDF)\n👉 mm10: 📎 View report (PDF)\n\n\n7.1.2 🚀 Usage: run_pipeline2.sh\nThis script runs Pipeline 2 — performing peak calling, replicate QC, IDR analysis, and functional annotation using MACS3 and HOMER.\n\n7.1.2.1 ✅ Default Run\nRun with all default parameters:\nbash run_pipeline2.sh\nThis will use:\n\nREFERENCE = hg38\nMAPPING = metadata/mapping.tsv\nPEAK_CALLER = both (MACS3 and HOMER)\nTHREADS = 4\nIDR_THRESHOLD = 0.05\nTARGET_RULES = templates/target_peak_rules.yaml\nTSS_DB = HOMER (for annotation)\n\n\n✅ Defaults are suitable for most ChIP-seq and ATAC-seq use cases.\n\n\n\n7.1.2.2 🔧 Full Custom Run\nCustomize all parameters:\nbash run_pipeline2.sh \\\n  -r mm10 \\\n  -m data/sample_metadata.tsv \\\n  -p macs3 \\\n  -t 8 \\\n  -i 0.01 \\\n  -y templates/target_peak_rules_HOMER.yaml \\\n  --tss-db clusterProfiler\nExplanation:\n\n-r mm10 → Use mouse genome\n-m data/sample_metadata.tsv → Custom metadata file\n-p macs3 → Use MACS3 only (can be macs3, homer, or both)\n-t 8 → Use 8 threads\n-i 0.01 → Adjust IDR threshold\n-y templates/target_peak_rules_HOMER.yaml → Custom target rules\n--tss-db clusterProfiler → Use clusterProfiler instead of HOMER for gene annotation.\n\n\n\n7.1.2.3 ℹ️ Help\nTo see all options:\nbash run_pipeline2.sh --help\n\n\n\n7.1.3 📄 1. mapping_schema.yaml — Metadata Validation Rules\nDefines structure and validation logic for your mapping.tsv metadata.\n\n7.1.3.1 🔍 Key Elements:\n\nRequired fields: Sample_ID, Instrument, Sample_Type, Condition, Replicate, Target\nOptional fields: Cell_line, Spike_Type\nRegex validation: For fields like Sample_Type, Replicate\n\n\n\n7.1.3.2 ✅ Validate Schema File\nbash modules/utils/validate_mapping_yaml.sh templates/mapping_schema.yaml\n\n\n7.1.3.3 ✅ Validate Metadata File\npython3 modules/utils/validate_mapping.py \\\n  --mapping metadata/mapping.tsv \\\n  --schema templates/mapping_schema.yaml\n\n\n\n7.1.4 📄 2. target_peak_rules.yaml — Peak Calling Styles (MACS3)\nThis config determines which targets require narrow or broad peak calling.\nExamples:\n\nCTCF, MYC → narrowPeak\nH3K27me3, EZH2 → broadPeak\n\n\n\n7.1.5 📄 3. target_peak_rules_HOMER.yaml — Peak Calling Styles (HOMER)\nClassifies targets by style for findPeaks:\n\nfactor → e.g., MYC, SOX2\nhistone → e.g., H3K27me3, EZH2\nGROseq, DNaseI, etc.\n\n\n⚠️ Note: These files are pre-validated. If you add new targets, you must write your own validation."
+  },
+  {
+    "objectID": "wiki_combined.html#modules-01_replicate_qc.sh-to-06_igv_snapshot.sh",
+    "href": "wiki_combined.html#modules-01_replicate_qc.sh-to-06_igv_snapshot.sh",
+    "title": "ChIP-seq Modular Analysis Pipeline",
+    "section": "7.2 📊 Modules: 01_replicate_qc.sh to 06_igv_snapshot.sh",
+    "text": "7.2 📊 Modules: 01_replicate_qc.sh to 06_igv_snapshot.sh\nmodules/pipeline2/\n├── 01_replicate_qc.sh\n├── 02_merge_pseudoreplicates.sh\n├── 03_1_MACS3_peak_calling.sh\n├── 03_2_homer_peak_calling_fold_fdr_relaxed.sh\n├── 03_2_homer_to_peakFormat.R\n├── 03_3_MACS3_peak_calling_pooled_pseudoreps.sh\n├── 03_4_homer_peak_calling_pooled_pseudoreps.sh\n├── 04_plot_idr_summary.R\n├── 04_run_idr.sh\n├── 05_peak_annotation.sh\n├── 06_igv_snapshot.sh\n└── cluster_enrichment_updated_hg_mice.R\n\n7.2.1 🔧 Modules\n\n\n\n\n\n\n\nScript\nPurpose\n\n\n\n\n01_replicate_qc.sh\nAnalyzes biological replicates for correlation (cutoff: 0.8), filters low-correlation samples.\n\n\n02_merge_pseudoreplicates.sh\nMerges BAMs and creates pseudo-replicates for IDR.\n\n\n03_1_MACS3_peak_calling.sh\nPeak calling using MACS3 with smart baseline control matching.\n\n\n03_2_homer_peak_calling_fold_fdr_relaxed.sh\nHOMER-based peak calling using target_peak_rules_HOMER.yaml.\n\n\n03_3_MACS3_peak_calling_pooled_pseudoreps.sh\nMACS3 peak calling for pooled/pseudo BAMs.\n\n\n03_4_homer_peak_calling_pooled_pseudoreps.sh\nHOMER peak calling for pooled/pseudo BAMs.\n\n\n04_run_idr.sh\nRuns IDR on replicate pairs, pooled vs individual, etc.\n\n\n05_peak_annotation.sh\nPerforms TSS annotation of peak files.\n\n\n06_igv_snapshot.sh\nGenerates IGV snapshots for peak visualization.\n\n\n\n\n\n\n\n\n⚠️ Note :06_igv_snapshot.sh is an extra module not yet adapted to the pipeline. This particular script produce to many snapshots if the user do not define the peaks based on their needs. ————————————————————————"
+  },
+  {
+    "objectID": "wiki_combined.html#analysis-folder-structure",
+    "href": "wiki_combined.html#analysis-folder-structure",
+    "title": "ChIP-seq Modular Analysis Pipeline",
+    "section": "7.3 🗂 Analysis Folder Structure",
+    "text": "7.3 🗂 Analysis Folder Structure\nanalysis$ tree -L 1\n.\n├── BAM_replicate_fail\n├── ChIPseeker_TSS_Hommer_IDR_annotation\n├── IDR_Results\n│   ├── homer\n│   └── macs3\n├── PeakCalling_HOMER\n├── PeakCalling_HOMER_pool_pseudo\n├── PeakCalling_MACS3\n├── PeakCalling_MACS3_pool_pseudo\n├── Pooled_BAMs\n├── pooling_log.tsv\n├── Pool_Pseudo_QC_stats\n├── Pseudoreplicates\n├── Renamed_Cleaned\n└── Replicate_QC\n    ├── bigwig\n    ├── deeptools\n    ├── pbc_metrics.tsv\n    └── tmp_groups"
+  },
+  {
+    "objectID": "wiki_combined.html#creating-the-mapping.tsv-file-metadata-table",
+    "href": "wiki_combined.html#creating-the-mapping.tsv-file-metadata-table",
+    "title": "ChIP-seq Modular Analysis Pipeline",
+    "section": "8.1 🗺️ Creating the mapping.tsv File (Metadata Table)",
+    "text": "8.1 🗺️ Creating the mapping.tsv File (Metadata Table)\nThe metadata file is crucial for automating sample grouping, identifying replicates, and selecting the appropriate peak caller.\n\n🧠 Filename required: metadata/mapping.tsv\n\n\n8.1.1 ✅ Required Columns\n\n\n\n\n\n\n\n\nColumn\nDescription\nExample\n\n\n\n\nSample_ID\nUnique ID matching FASTQ or BAM files\nSRR123456\n\n\nInstrument\nSequencing instrument or platform\nIllumina\n\n\nSample_Type\nChIP, Input, IgG, Mock, etc.\nChIP\n\n\nCondition\nExperimental condition or group\nTreated, WT\n\n\nReplicate\nReplicate number (1, 2, 3, …)\n1\n\n\nTarget\nTranscription factor or histone mark\nH3K27ac, CTCF\n\n\n\n\n\n8.1.2 📝 Optional Columns\n\n\n\nColumn\nDescription\nExample\n\n\n\n\nCell_line\nCell line used\nHEK293\n\n\nSpike_Type\nIf spike-in is used (e.g., dm6, ERCC)\ndm6\n\n\n\n\n\n8.1.3 📁 Example Structure\nSample_ID   Instrument  Sample_Type Condition   Replicate   Target  Cell_line   Spike_Type\nSRR001      Illumina    ChIP        WT          1         CTCF       HEK293     dm6\nSRR002      Illumina    ChIP        WT          2         CTCF       HEK293     dm6\nSRR003      Illumina    Input       WT          1         None       HEK293     dm6\nSRR004      Illumina    ChIP        KO          1         H3K27me3   HEK293     dm6\nSRR005      Illumina    ChIP        KO          2         H3K27me3   HEK293     dm6\nSRR006      Illumina    Input       KO          1         None       HEK293     dm6\n\n\n8.1.4 🧪 Validation Steps\nMake sure your file is valid before starting the pipeline:\n\nValidate schema:\n\nbash modules/utils/validate_mapping_yaml.sh templates/mapping_schema.yaml\n\nValidate metadata:\n\npython3 modules/utils/validate_mapping.py \\\n  --mapping metadata/mapping.tsv \\\n  --schema templates/mapping_schema.yaml\n✔️ You should see “Validation Passed” if everything is correct."
+  },
+  {
+    "objectID": "wiki_combined.html#what-is-mapping.tsv-and-why-is-it-important",
+    "href": "wiki_combined.html#what-is-mapping.tsv-and-why-is-it-important",
+    "title": "ChIP-seq Modular Analysis Pipeline",
+    "section": "8.2 📋 What is mapping.tsv and Why Is It Important?",
+    "text": "8.2 📋 What is mapping.tsv and Why Is It Important?\n\n8.2.1 🔍 What is it?\nThe mapping.tsv is a metadata table—a plain text file in tab-separated format—that contains structured information about each sample in your ChIP-seq experiment. Each row represents a sequencing sample, and each column provides key attributes (e.g., sample ID, condition, replicate number, target protein, etc.).\nThis file needs to be stored at:\nmetadata/mapping.tsv\nThis mapping table will be transformed during the pipeline process: at then you will have a backup (mapping.tsv.bak), mapping_filtered.tsv (produce after replicates QC), and mapping_scaled.tsv (produced after bam cleaning, it contains the ratio of exogenous spike , if spike was detected, and the spike genome type).\n\n\n8.2.2 🧠 Why is it needed?\nThis file is critical for enabling your pipeline to:\n✅ Recognize and organize samples automatically ✅ Group replicates (for IDR and reproducibility checks) ✅ Assign controls (Input, IgG, Mock) correctly for peak calling ✅ Select peak caller styles (e.g., narrowPeak for TFs, broadPeak for histone marks) ✅ Validate input consistency using the YAML schema\nWithout this file, the pipeline wouldn’t know how your samples relate to each other—or how to process them correctly.\n\n\n8.2.3 🔗 How does the pipeline use it?\n\nPipeline 1: The script 11_Renaming_bam.sh uses the metadata to automatically rename BAM files and organize them into logical groups.\nPipeline 2: Several scripts (e.g., 01_replicate_qc.sh, 03_1_MACS3_peak_calling.sh) read mapping.tsv to apply the right rules for:\n\nSample pairing (ChIP vs. Input)\nReplicate merging\nPeak calling type\nReproducibility evaluation (IDR)\n\nValidation scripts (validate_mapping.py, validate_mapping_yaml.sh) ensure the file is complete and follows strict format rules before any analysis starts.\n\n\n\n8.2.4 🧬 Summary\n\n\n\n\n\n\n\nFeature\nWhy it matters\n\n\n\n\nAutomation\nRemoves manual handling of sample groups\n\n\nReproducibility\nEnsures the same logic applies every time\n\n\nCompatibility\nLets the pipeline work across diverse experimental designs\n\n\nQuality control\nPrevents broken analyses due to misannotated samples"
+  },
+  {
+    "objectID": "wiki_combined.html#running-pipeline1-with-docker",
+    "href": "wiki_combined.html#running-pipeline1-with-docker",
+    "title": "ChIP-seq Modular Analysis Pipeline",
+    "section": "9.1 🏃 Running Pipeline1 with Docker",
+    "text": "9.1 🏃 Running Pipeline1 with Docker\n🐳 Docker Usage Guide\nThis guide explains how to build and run the ChIP-seq processing pipeline using Docker. It is designed for users at all levels, including beginners.\nWhile the original pipeline was created to work directly in Host-based installation, the pipeline can be used with docker containers and mounting the required folder needed for the package This pipeline is fully containerized and can be run with a single Docker command. Below is the recommended usage to preserve outputs, access your own data, and avoid re-downloading references.\n\n9.1.1 🔧 Docker Requirements\n\nDocker installed and working (docker --version)\nYour working directory should contain:\n\nReference/ — genome files (e.g. hg38, mm10, etc.)\nmetadata/ — sample sheet (SRR_Acc_List.txt, etc.)\nsamples/ — (optional) pre-existing FASTQs\nresults/ — (created if missing) final output goes here\nlogs/ — (created if missing) all logs go here\n\n\n\n\n9.1.2 🧪 Run Command (Example)\ndocker run --rm \\\n  -v \"$PWD/Reference\":/pipeline/Reference \\\n  -v \"$PWD/SpikeinReference\":/pipeline/SpikeinReference \\\n  -v \"$PWD/metadata\":/pipeline/metadata \\\n  -v \"$PWD/samples\":/pipeline/samples \\\n  -v \"$PWD/results\":/pipeline/results \\\n  -v \"$PWD/logs\":/pipeline/logs \\\n  -v \"$PWD/logs\":/pipeline/assets \\\n  pipeline1:latest -t 4 -r mm10 -a tn5_truseq\n\n\n9.1.3 📝 Explanation\n\n\n\n\n\n\n\nOption\nDescription\n\n\n\n\n--rm\nRemoves container after run\n\n\n-v &lt;host&gt;:&lt;container&gt;\nMounts folders into container\n\n\n-t 4\nNumber of threads\n\n\n-r mm10\nReference genome (hg38, mm10, etc.)\n\n\n-a tn5_truseq\nAdapter type (should match what’s in your pipeline)\n\n\npipeline1:latest\nDocker image name\n\n\n\n\n\n9.1.4 📂 Output\nAll outputs go into your local results/ and logs/ folders — no data is lost after the container exits."
+  },
+  {
+    "objectID": "wiki_combined.html#software-requirements-non-docker-setup",
+    "href": "wiki_combined.html#software-requirements-non-docker-setup",
+    "title": "ChIP-seq Modular Analysis Pipeline",
+    "section": "12.1 ⚙️ Software Requirements (Non-Docker Setup)",
+    "text": "12.1 ⚙️ Software Requirements (Non-Docker Setup)\nWhile this pipeline is fully Docker-compatible, you can also run it natively by installing the required software through 🐍 Conda and 📘 ℝ .\n\n12.1.1 📁 Environment Files\nAll environment setup files are located in:\nenv/\n├── env_pipeline_base.yml     # Conda YAML file (base system + CLI tools)\n├── env_pipeline_r.R          # R script to install required R/Bioconductor packages\n\n\n12.1.2 🧪 Step 1: Create Conda Environment\nUse the provided YAML file to create a clean Conda environment with all the command-line tools.\nconda env create -f env/env_pipeline_base.yml\nconda activate chipseq_pipeline_base\n\n\n12.1.3 📦 Step 2: Install R and Bioconductor Packages\nOnce inside the conda environment, install the required R packages using:\nRscript env/env_pipeline_r.R\nThis script will:\n\nCheck for missing CRAN or Bioconductor dependencies\nInstall them as needed\nLoad the correct annotation packages for both human (hg38) and mouse (mm10) genomes\n\n\n\n12.1.4 🧰 Tool Dependencies\nSome tools like picard.jar and qualimap are not installed via Conda but are required. These are bundled inside the pipeline under:\ntools/\n├── picard.jar      # Required for BAM metadata tagging\n├── qualimap/       # For BAM quality metrics (must be Java-compatible)\nMake sure:\n\ntools/picard.jar is accessible (used by AddOrReplaceReadGroups)\ntools/qualimap/ is executable and on your PATH or referenced directly by the scripts\n\nEnsure these are available in your environment or adjust the relevant paths in the pipeline scripts.\n🐳 Or Use Docker For reference, installation steps are also reflected in the Dockerfiles:\nbash Copy Edit Dockerfile.pipeline1 Dockerfile.pipeline2 These show the exact installation process and can be adapted for manual setup if needed."
+  },
+  {
+    "objectID": "wiki_combined.html#software-requirements-non-docker-setup-1",
+    "href": "wiki_combined.html#software-requirements-non-docker-setup-1",
+    "title": "ChIP-seq Modular Analysis Pipeline",
+    "section": "13.1 🧰 Software Requirements (Non-Docker Setup)",
+    "text": "13.1 🧰 Software Requirements (Non-Docker Setup)\nIf you’re running the pipeline without Docker, your system must have the following tools installed and available in your PATH — except for picard.jar and qualimap, which are already bundled in the pipeline under tools/ and should remain there.\n\n13.1.1 📦 Core Requirements\nInstall the following tools via your package manager (apt, brew, conda, etc.) or from source as needed:\n\n\n\n\n\n\n\n\nTool\nMinimum Version\nPurpose\n\n\n\n\nbash\n4.0+\nShell scripting\n\n\ncutadapt\n4.0+\nAdapter trimming\n\n\nbwa\n0.7.17+\nRead alignment\n\n\nsamtools\n1.14+\nBAM/SAM manipulation\n\n\npicard\n2.26.10+\nBAM post-processing\n\n\nmacs3\n3.0.0a6+\nPeak calling\n\n\nhomer\nv4.11+\nAlternative peak calling\n\n\npython3\n3.9+\nUsed for helper scripts\n\n\npip\nLatest\nPython package management\n\n\nR\n4.2+\nStatistical computing environment\n\n\nRscript\n4.2+\nScript execution for R modules\n\n\nbedtools\n2.30.0+\nGenomic interval operations\n\n\ndeepTools\n3.5.1+\nQC and coverage tools\n\n\nidr\n2.0.4.2 (patched)\nPeak reproducibility scoring\n\n\njq\n1.6+\nJSON parsing (metadata scripts)\n\n\nwget/curl\nany\nData downloading\n\n\nyq\n4.0+\nYAML parsing and editing (Go-based)\n\n\n\n\n\n13.1.2 📚 Required Python Packages\nInstall with:\npip install numpy pandas pyyaml\n\n\n13.1.3 📚 Required R Packages\nYour pipeline includes scripts that require the following CRAN and Bioconductor packages:\n\n13.1.3.1 From CRAN:\n\ndplyr\nggplot2\ntidyr\ndata.table\nreadr\nstringr\ntools\njsonlite\nhttr\n\n\n\n13.1.3.2 From Bioconductor:\n\nclusterProfiler\nenrichplot\nReactomePA\nreactome.db\nbiomaRt\nAnnotationDbi\norg.Hs.eg.db\norg.Mm.eg.db\n\n\n✅ The R scripts automatically attempt to install missing packages if your internet connection is available.\n\n\n\n\n13.1.4 🧬 Optional (for full compatibility)\n\nFastQC\nMultiQC\nIGV (for manual visualization)\ndocker (if you’d like to use pre-built containers)"
   }
 ]

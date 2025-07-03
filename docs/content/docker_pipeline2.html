@@ -241,12 +241,23 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#build-the-docker-image" id="toc-build-the-docker-image" class="nav-link active" data-scroll-target="#build-the-docker-image"><span class="header-section-number">0.1</span> 👷‍️⛏️ 1. Build the Docker Image</a></li>
-  <li><a href="#project-structure" id="toc-project-structure" class="nav-link" data-scroll-target="#project-structure"><span class="header-section-number">0.2</span> 📁 2. Project Structure</a></li>
-  <li><a href="#mounting-folders" id="toc-mounting-folders" class="nav-link" data-scroll-target="#mounting-folders"><span class="header-section-number">0.3</span> 🗃️ 3. Mounting Folders</a></li>
-  <li><a href="#run-the-pipeline" id="toc-run-the-pipeline" class="nav-link" data-scroll-target="#run-the-pipeline"><span class="header-section-number">0.4</span> 🏃 4. Run the Pipeline</a></li>
-  <li><a href="#output-files" id="toc-output-files" class="nav-link" data-scroll-target="#output-files"><span class="header-section-number">0.5</span> 📦 5. Output Files</a></li>
-  <li><a href="#optional-helper-shell-script" id="toc-optional-helper-shell-script" class="nav-link" data-scroll-target="#optional-helper-shell-script"><span class="header-section-number">0.6</span> 🛠️️️ 6. Optional: Helper Shell Script</a></li>
+  <li><a href="#what-is-pipeline2" id="toc-what-is-pipeline2" class="nav-link active" data-scroll-target="#what-is-pipeline2"><span class="header-section-number">1</span> 🧪 What Is Pipeline2?</a></li>
+  <li><a href="#requirements" id="toc-requirements" class="nav-link" data-scroll-target="#requirements"><span class="header-section-number">2</span> ✅ Requirements</a>
+  <ul class="collapse">
+  <li><a href="#project-structure" id="toc-project-structure" class="nav-link" data-scroll-target="#project-structure"><span class="header-section-number">2.1</span> 📁 2. Project Structure</a></li>
+  </ul></li>
+  <li><a href="#section" id="toc-section" class="nav-link" data-scroll-target="#section"><span class="header-section-number">3</span> ————————————————————————</a></li>
+  <li><a href="#build-the-docker-image" id="toc-build-the-docker-image" class="nav-link" data-scroll-target="#build-the-docker-image"><span class="header-section-number">4</span> 🏗️ Build the Docker Image</a></li>
+  <li><a href="#folder-mounts-summary" id="toc-folder-mounts-summary" class="nav-link" data-scroll-target="#folder-mounts-summary"><span class="header-section-number">5</span> 📁 Folder Mounts Summary</a></li>
+  <li><a href="#run-with-default-options" id="toc-run-with-default-options" class="nav-link" data-scroll-target="#run-with-default-options"><span class="header-section-number">6</span> ▶️ Run With Default Options</a></li>
+  <li><a href="#full-example-with-options" id="toc-full-example-with-options" class="nav-link" data-scroll-target="#full-example-with-options"><span class="header-section-number">7</span> ⚙️ Full Example With Options</a></li>
+  <li><a href="#dry-run-mode" id="toc-dry-run-mode" class="nav-link" data-scroll-target="#dry-run-mode"><span class="header-section-number">8</span> 🔍 Dry Run Mode</a></li>
+  <li><a href="#output" id="toc-output" class="nav-link" data-scroll-target="#output"><span class="header-section-number">9</span> 📂 Output</a></li>
+  <li><a href="#troubleshooting" id="toc-troubleshooting" class="nav-link" data-scroll-target="#troubleshooting"><span class="header-section-number">10</span> 🧼 Troubleshooting</a></li>
+  <li><a href="#next-steps" id="toc-next-steps" class="nav-link" data-scroll-target="#next-steps"><span class="header-section-number">11</span> ✅ Next Steps</a>
+  <ul class="collapse">
+  <li><a href="#optional-helper-shell-script" id="toc-optional-helper-shell-script" class="nav-link" data-scroll-target="#optional-helper-shell-script"><span class="header-section-number">11.1</span> 🛠️️️ 6. Optional: Helper Shell Script</a></li>
+  </ul></li>
   </ul>
 </nav>
     </div>
@@ -272,20 +283,36 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<hr>
-<section id="build-the-docker-image" class="level3" data-number="0.1">
-<h3 data-number="0.1" class="anchored" data-anchor-id="build-the-docker-image"><span class="header-section-number">0.1</span> 👷‍️⛏️ 1. Build the Docker Image</h3>
-<p>From the folder containing <code>Dockerfile.pipeline2</code>, run:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> build <span class="at">-f</span> Dockerfile.pipeline2 <span class="at">-t</span> pipeline2-image .</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="what-is-pipeline2" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="what-is-pipeline2"><span class="header-section-number">1</span> 🧪 What Is Pipeline2?</h2>
+<p>Pipeline2 is the second part of the ChIP-seq modular system. It performs:</p>
 <ul>
-<li><code>-f</code>: specifies the Dockerfile to use.</li>
-<li><code>-t</code>: tags the image name as <code>pipeline2-image</code>.</li>
-<li><code>.</code>: tells Docker to build using the current directory context.</li>
+<li>Peak calling (<code>MACS3</code> or <code>HOMER</code>)</li>
+<li>Reproducibility analysis (<code>IDR</code>)</li>
+<li>Annotation and final reporting</li>
 </ul>
+<p>It is designed to consume output from <strong>Pipeline1</strong> (<code>analysis/</code>) and produce final results in <code>results/</code>.</p>
 <hr>
 </section>
-<section id="project-structure" class="level3" data-number="0.2">
-<h3 data-number="0.2" class="anchored" data-anchor-id="project-structure"><span class="header-section-number">0.2</span> 📁 2. Project Structure</h3>
+<section id="requirements" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="requirements"><span class="header-section-number">2</span> ✅ Requirements</h2>
+<ul>
+<li>Docker installed (<code>docker --version</code>)</li>
+<li>Pipeline image built (see below)</li>
+<li>Directory structure including:</li>
+</ul>
+<pre><code>
+Reference/         # Genome references
+metadata/          # Sample and group mapping
+templates/         # Configuration files
+analysis/          # Output from pipeline1
+results/           # New output
+tools/, assets/    # Utility scripts and helper data
+modules/           # Contains pipeline2 logic
+</code></pre>
+<hr>
+<section id="project-structure" class="level3" data-number="2.1">
+<h3 data-number="2.1" class="anchored" data-anchor-id="project-structure"><span class="header-section-number">2.1</span> 📁 2. Project Structure</h3>
 <p>A typical folder layout:</p>
 <pre><code>your_project/
 ├── run_pipeline2.sh
@@ -297,117 +324,187 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 ├── logs/
 ├── analysis/           # Will be populated by the pipeline</code></pre>
 <p>Ensure all these folders exist, especially <code>Reference/</code>, <code>metadata/</code>, and <code>modules/</code>.</p>
+</section>
+</section>
+<section id="section" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="section"><span class="header-section-number">3</span> ————————————————————————</h2>
+</section>
+<section id="build-the-docker-image" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="build-the-docker-image"><span class="header-section-number">4</span> 🏗️ Build the Docker Image</h2>
+<p>From your project root:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> build <span class="at">-f</span> Docker/Dockerfile.pipeline2 <span class="at">-t</span> pipeline2-test .</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>This command builds a Docker image using your latest <code>Dockerfile.pipeline2</code>.</p>
 <hr>
 </section>
-<section id="mounting-folders" class="level3" data-number="0.3">
-<h3 data-number="0.3" class="anchored" data-anchor-id="mounting-folders"><span class="header-section-number">0.3</span> 🗃️ 3. Mounting Folders</h3>
-<p>To give Docker access to your files, bind-mount these folders:</p>
+<section id="folder-mounts-summary" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="folder-mounts-summary"><span class="header-section-number">5</span> 📁 Folder Mounts Summary</h2>
 <table class="caption-top table">
-<colgroup>
-<col style="width: 57%">
-<col style="width: 16%">
-<col style="width: 25%">
-</colgroup>
 <thead>
 <tr class="header">
-<th>Host Path</th>
-<th>Docker Path</th>
-<th>Reason</th>
+<th>Host Folder</th>
+<th>Container Path</th>
+<th>Purpose</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>$PWD</code></td>
-<td><code>/pipeline2</code></td>
-<td>Root of your pipeline package</td>
+<td><code>analysis/</code></td>
+<td><code>/data/analysis</code></td>
+<td>Input from pipeline1</td>
 </tr>
 <tr class="even">
-<td><code>$PWD/Reference</code></td>
-<td><code>/pipeline2/Reference</code></td>
-<td>Genome files (FASTA, GTF, BED)</td>
+<td><code>results/</code></td>
+<td><code>/data/results</code></td>
+<td>Output from pipeline2</td>
 </tr>
 <tr class="odd">
-<td><code>$PWD/metadata</code></td>
-<td><code>/pipeline2/metadata</code></td>
-<td>Sample metadata for input</td>
+<td><code>Reference/</code></td>
+<td><code>/data/Reference</code></td>
+<td>Genome references</td>
 </tr>
 <tr class="even">
-<td><code>$PWD/templates</code></td>
-<td><code>/pipeline2/templates</code></td>
-<td>Mapping schema, rules</td>
+<td><code>metadata/</code></td>
+<td><code>/data/metadata</code></td>
+<td>Metadata and mapping</td>
 </tr>
 <tr class="odd">
-<td><code>$PWD/logs</code></td>
-<td><code>/pipeline2/logs</code></td>
-<td>Store logs</td>
+<td><code>templates/</code></td>
+<td><code>/data/templates</code></td>
+<td>Pipeline configuration</td>
 </tr>
 <tr class="even">
-<td><code>$PWD/analysis</code></td>
-<td><code>/pipeline2/analysis</code></td>
-<td>All analysis results are saved here</td>
+<td><code>modules/</code></td>
+<td><code>/data/modules</code></td>
+<td>Contains pipeline2 logic</td>
 </tr>
 <tr class="odd">
-<td><code>$PWD/assets</code></td>
-<td><code>/pipeline2/assets</code></td>
-<td>Contains images icon for the IDR</td>
+<td><code>assets/</code></td>
+<td><code>/data/assets</code></td>
+<td>Visual assets and icons</td>
 </tr>
 <tr class="even">
-<td></td>
-<td></td>
-<td>report. Can be changed by user</td>
-</tr>
-<tr class="odd">
-<td><hr></td>
-<td></td>
-<td></td>
+<td><code>tools/</code></td>
+<td><code>/pipeline/tools</code></td>
+<td>Custom scripts and binaries</td>
 </tr>
 </tbody>
 </table>
-</section>
-<section id="run-the-pipeline" class="level3" data-number="0.4">
-<h3 data-number="0.4" class="anchored" data-anchor-id="run-the-pipeline"><span class="header-section-number">0.4</span> 🏃 4. Run the Pipeline</h3>
-<p>Example command:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">--rm</span> <span class="dt">\</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">-v</span> <span class="st">"</span><span class="va">$PWD</span><span class="st">:/pipeline2"</span> <span class="dt">\</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">-v</span> <span class="st">"</span><span class="va">$PWD</span><span class="st">/Reference:/pipeline2/Reference"</span> <span class="dt">\</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">-v</span> <span class="st">"</span><span class="va">$PWD</span><span class="st">/metadata:/pipeline2/metadata"</span> <span class="dt">\</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">-v</span> <span class="st">"</span><span class="va">$PWD</span><span class="st">/templates:/pipeline2/templates"</span> <span class="dt">\</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">-v</span> <span class="st">"</span><span class="va">$PWD</span><span class="st">/logs:/pipeline2/logs"</span> <span class="dt">\</span></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">-v</span> <span class="st">"</span><span class="va">$PWD</span><span class="st">/analysis:/pipeline2/analysis"</span> <span class="dt">\</span></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">-w</span> /pipeline2 <span class="dt">\</span></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  pipeline2-image <span class="dt">\</span></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  bash run_pipeline2.sh <span class="at">--caller</span> macs3 <span class="at">-genome</span> mm10</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <hr>
 </section>
-<section id="output-files" class="level3" data-number="0.5">
-<h3 data-number="0.5" class="anchored" data-anchor-id="output-files"><span class="header-section-number">0.5</span> 📦 5. Output Files</h3>
-<p>After running, the results will be in:</p>
+<section id="run-with-default-options" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="run-with-default-options"><span class="header-section-number">6</span> ▶️ Run With Default Options</h2>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">--rm</span> <span class="at">-it</span> <span class="dt">\</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">-v</span> <span class="st">"</span><span class="va">$PWD</span><span class="st">/analysis:/data/analysis"</span> <span class="dt">\</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">-v</span> <span class="st">"</span><span class="va">$PWD</span><span class="st">/results:/data/results"</span> <span class="dt">\</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">-v</span> <span class="st">"</span><span class="va">$PWD</span><span class="st">/Reference:/data/Reference"</span> <span class="dt">\</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">-v</span> <span class="st">"</span><span class="va">$PWD</span><span class="st">/metadata:/data/metadata"</span> <span class="dt">\</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">-v</span> <span class="st">"</span><span class="va">$PWD</span><span class="st">/templates:/data/templates"</span> <span class="dt">\</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">-v</span> <span class="st">"</span><span class="va">$PWD</span><span class="st">/modules:/data/modules"</span> <span class="dt">\</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">-v</span> <span class="st">"</span><span class="va">$PWD</span><span class="st">/assets:/data/assets"</span> <span class="dt">\</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">-v</span> <span class="st">"</span><span class="va">$PWD</span><span class="st">/tools:/pipeline/tools"</span> <span class="dt">\</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  pipeline2-test <span class="dt">\</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>  bash run_pipeline2.sh <span class="at">--caller</span> homer <span class="at">--genome</span> hg38</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<hr>
+</section>
+<section id="full-example-with-options" class="level2" data-number="7">
+<h2 data-number="7" class="anchored" data-anchor-id="full-example-with-options"><span class="header-section-number">7</span> ⚙️ Full Example With Options</h2>
+<div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">--rm</span> <span class="at">-it</span> <span class="dt">\</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">-v</span> <span class="st">"</span><span class="va">$PWD</span><span class="st">/analysis:/data/analysis"</span> <span class="dt">\</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">-v</span> <span class="st">"</span><span class="va">$PWD</span><span class="st">/results:/data/results"</span> <span class="dt">\</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">-v</span> <span class="st">"</span><span class="va">$PWD</span><span class="st">/Reference:/data/Reference"</span> <span class="dt">\</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">-v</span> <span class="st">"</span><span class="va">$PWD</span><span class="st">/metadata:/data/metadata"</span> <span class="dt">\</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">-v</span> <span class="st">"</span><span class="va">$PWD</span><span class="st">/templates:/data/templates"</span> <span class="dt">\</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">-v</span> <span class="st">"</span><span class="va">$PWD</span><span class="st">/modules:/data/modules"</span> <span class="dt">\</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">-v</span> <span class="st">"</span><span class="va">$PWD</span><span class="st">/assets:/data/assets"</span> <span class="dt">\</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">-v</span> <span class="st">"</span><span class="va">$PWD</span><span class="st">/tools:/pipeline/tools"</span> <span class="dt">\</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  pipeline2-test <span class="dt">\</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  bash run_pipeline2.sh <span class="dt">\</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">--caller</span> macs3 <span class="dt">\</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">--genome</span> mm10 <span class="dt">\</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">-t</span> 8 <span class="dt">\</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">-m</span> metadata/mapping.tsv <span class="dt">\</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">-f</span> true <span class="dt">\</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">-c</span> spearman</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<blockquote class="blockquote">
+<p>✅ <code>--caller</code>: choose <code>macs3</code> or <code>homer</code> ✅ <code>-t</code>: number of threads ✅ <code>-f</code>: filtering enabled (<code>true</code>/<code>false</code>) ✅ <code>-c</code>: correlation method</p>
+</blockquote>
+<hr>
+</section>
+<section id="dry-run-mode" class="level2" data-number="8">
+<h2 data-number="8" class="anchored" data-anchor-id="dry-run-mode"><span class="header-section-number">8</span> 🔍 Dry Run Mode</h2>
+<p>If your pipeline supports <code>--dry-run</code>, test like this:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">bash</span> run_pipeline2.sh <span class="at">--caller</span> homer <span class="at">--dry-run</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Inside Docker:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">--rm</span> <span class="at">-it</span> pipeline2-test</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> /pipeline <span class="kw">&amp;&amp;</span> <span class="fu">bash</span> run_pipeline2.sh <span class="at">--dry-run</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<hr>
+</section>
+<section id="output" class="level2" data-number="9">
+<h2 data-number="9" class="anchored" data-anchor-id="output"><span class="header-section-number">9</span> 📂 Output</h2>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Folder</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>results/</code></td>
+<td>Final peak files, reports, plots</td>
+</tr>
+<tr class="even">
+<td><code>analysis/</code></td>
+<td>Used from pipeline1 as source input</td>
+</tr>
+<tr class="odd">
+<td><code>logs/</code></td>
+<td>Per-module logs (optional, if implemented)</td>
+</tr>
+</tbody>
+</table>
+<hr>
+</section>
+<section id="troubleshooting" class="level2" data-number="10">
+<h2 data-number="10" class="anchored" data-anchor-id="troubleshooting"><span class="header-section-number">10</span> 🧼 Troubleshooting</h2>
 <ul>
-<li><code>analysis/</code> — contains pipeline outputs and QC summaries</li>
-<li><code>logs/</code> — contains module-specific logs</li>
-<li><code>metadata/mapping_filtered_IDR.tsv</code> — filtered metadata after validation</li>
+<li><p>Make sure your Docker mounts point to actual directories (<code>ls</code> to verify).</p></li>
+<li><p>Try running Docker without volumes first to debug logic:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">--rm</span> <span class="at">-it</span> pipeline2-test</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">bash</span> run_pipeline2.sh <span class="at">--caller</span> homer</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
 </ul>
 <hr>
 </section>
-<section id="optional-helper-shell-script" class="level3" data-number="0.6">
-<h3 data-number="0.6" class="anchored" data-anchor-id="optional-helper-shell-script"><span class="header-section-number">0.6</span> 🛠️️️ 6. Optional: Helper Shell Script</h3>
+<section id="next-steps" class="level2" data-number="11">
+<h2 data-number="11" class="anchored" data-anchor-id="next-steps"><span class="header-section-number">11</span> ✅ Next Steps</h2>
+<p>You can now:</p>
+<ul>
+<li>Validate outputs in <code>results/</code></li>
+<li>View filtered metadata in <code>metadata/mapping_filtered.tsv</code></li>
+<li>Optionally generate a downstream report or visualizations</li>
+</ul>
+<hr>
+<section id="optional-helper-shell-script" class="level3" data-number="11.1">
+<h3 data-number="11.1" class="anchored" data-anchor-id="optional-helper-shell-script"><span class="header-section-number">11.1</span> 🛠️️️ 6. Optional: Helper Shell Script</h3>
 <p>Create a script like <code>run.sh</code>:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">#!/bin/bash</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">--rm</span> <span class="dt">\</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">-v</span> <span class="st">"</span><span class="va">$PWD</span><span class="st">:/pipeline2"</span> <span class="dt">\</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">-v</span> <span class="st">"</span><span class="va">$PWD</span><span class="st">/Reference:/pipeline2/Reference"</span> <span class="dt">\</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">-v</span> <span class="st">"</span><span class="va">$PWD</span><span class="st">/metadata:/pipeline2/metadata"</span> <span class="dt">\</span></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">-v</span> <span class="st">"</span><span class="va">$PWD</span><span class="st">/templates:/pipeline2/templates"</span> <span class="dt">\</span></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">-v</span> <span class="st">"</span><span class="va">$PWD</span><span class="st">/logs:/pipeline2/logs"</span> <span class="dt">\</span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">-v</span> <span class="st">"</span><span class="va">$PWD</span><span class="st">/analysis:/pipeline2/analysis"</span> <span class="dt">\</span></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">-w</span> /pipeline2 <span class="dt">\</span></span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  pipeline2-image <span class="dt">\</span></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>  bash run_pipeline2.sh <span class="st">"</span><span class="va">$@</span><span class="st">"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co">#!/bin/bash</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">--rm</span> <span class="at">-it</span> <span class="dt">\</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">-v</span> <span class="st">"</span><span class="va">$PWD</span><span class="st">/analysis:/data/analysis"</span> <span class="dt">\</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">-v</span> <span class="st">"</span><span class="va">$PWD</span><span class="st">/results:/data/results"</span> <span class="dt">\</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">-v</span> <span class="st">"</span><span class="va">$PWD</span><span class="st">/Reference:/data/Reference"</span> <span class="dt">\</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">-v</span> <span class="st">"</span><span class="va">$PWD</span><span class="st">/metadata:/data/metadata"</span> <span class="dt">\</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">-v</span> <span class="st">"</span><span class="va">$PWD</span><span class="st">/templates:/data/templates"</span> <span class="dt">\</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">-v</span> <span class="st">"</span><span class="va">$PWD</span><span class="st">/modules:/data/modules"</span> <span class="dt">\</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">-v</span> <span class="st">"</span><span class="va">$PWD</span><span class="st">/assets:/data/assets"</span> <span class="dt">\</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">-v</span> <span class="st">"</span><span class="va">$PWD</span><span class="st">/tools:/pipeline/tools"</span> <span class="dt">\</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>  pipeline2-test <span class="dt">\</span></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>  bash run_pipeline2.sh <span class="st">"</span><span class="va">$@</span><span class="st">"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Then run it like this:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">chmod</span> +x run.sh</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="ex">./run.sh</span> <span class="at">--caller</span> homer <span class="at">-genome</span> mm10</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">chmod</span> +x run.sh</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="ex">./run.sh</span> <span class="at">--caller</span> homer <span class="at">-genome</span> mm10</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 
 
+</section>
 </section>
 
 </main> <!-- /main -->

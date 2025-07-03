@@ -1,0 +1,1407 @@
+
+
+# index
+
+---
+title: "ChIP-seq Modular Analysis Pipeline"
+format:
+  html:
+    toc: false
+    theme: cerulean
+---
+
+# 🧬 Welcome
+
+Welcome to the **ChIP-seq Modular Analysis Pipeline** documentation!
+
+This site provides a detailed manual for running and understanding the modular ChIP-seq pipeline developed by **Nancy Anderson**. It includes setup, usage, modules, metadata structure, Docker/Conda environments, and more.
+
+---
+
+## 📚 Sections
+
+- [Overview](overview.qmd)
+
+- [Pipeline 1: QC & Preprocessing](pipeline1.qmd)
+
+- [Pipeline 2: Peak Calling & Analysis](pipeline2.qmd)
+
+- [Metadata Guide](mapping.qmd)
+
+- [Docker Usage - Pipeline 1](docker_pipeline1.qmd)
+
+- [Docker Usage - Pipeline 2](docker_pipeline2.qmd)
+
+- [Unified Docker Guide](docker_guide.qmd)
+
+- [Conda Environment Setup](Conda.qmd)
+
+- [Software Requirements](software.qmd)
+
+- [Troubleshooting](troubleshooting.qmd)
+
+- [Citations](citations.qmd)
+
+- [License](license.qmd)
+
+---
+
+## 🧪 Quick Start
+
+If you're eager to run the pipeline quickly, jump to:
+
+👉 [Quick Start Guide](overview.qmd#quick-start---requirements)
+
+Or explore the **Docker options** for portable setup:
+
+👉 [Docker Setup](docker_guide.qmd)
+
+---
+
+
+
+
+# overview
+
+title: "Overview"
+
+## 🧬 Overview
+
+This pipeline was developed and tested on Linux with POSIX-compliant behavior, macOS compatibility is not supported, If adjustments are needed for your system, you are free to modify the setup accordingly. This is the first version and still in beta test. However you can download and tested in your system as full package or use every modular script. The goal was to create a first Github project to establish Bioinformatic competence by the author.
+
+This project implements a modular and reproducible **ChIP-seq analysis pipeline** designed for both human and mouse samples. The pipeline is organized into two main parts:
+
+1.  **Preprocessing and BAM Cleaning** – Modular pipeline for data preparation.
+2.  **Peak Calling and Reproducibility Analysis** – Peak detection, quality control, and IDR-based reproducibility assessment.
+
+The pipeline supports both **HOMER** and **MACS3** workflows, and uses metadata-based automation. Its structure mirrors the **ENCODE ChIP-seq processing pipeline**, providing a modular, standardized workflow to produce reproducible peak calls, generate signal tracks, and perform quality assessments such as IDR (Irreproducible Discovery Rate), while automating sample naming and grouping.
+
+This package is intended to be flexible and modular. Each module can be customized by the user, or the pipeline can be run as-is. It is **not a beginner-friendly pipeline**, nor was it designed to be. The pipeline runs directly in Bash on a Linux system. Docker files are included to allow execution within containers, and a brief guide is provided at the end of this text, explaining how to build the container and mount the required folders properly.
+
+To run this pipeline you will need to have your paired fastq.gz samples in the samples folder, a mapping.tsv data, and to set the reference files in the Reference folder and the spike reference genomes in the SpikeinReference folder.
+
+The package provide two dataset test from GEO dataset to test Hg38 and mm10 samples.
+
+Information about these two GEO datasets is provided in the README.md file inside the examples/ folder. The pipeline1 is adapted to automatically download an SRR_Acc_List.txt if the list in the metadata folder. We also provide the mapping.tsv as example
+
+
+## 📚 Pipeline Components
+
+### 🔧 1. **Read Preprocessing and Alignment**
+
+**Input:** FASTQ files (`reads`)
+
+**Tools Used:**
+
+-   `cutadapt`: Adapter trimming
+-   `BWA`: Alignment to reference genome
+-   `Samtools`, `Picard`: Sorting, deduplication, indexing, BAM cleanup
+
+**Outputs:**
+
+-   Unfiltered alignments
+-   Filtered, deduplicated BAM files
+-   Removal of excluded/blacklisted regions (e.g., ENCODE blacklist)
+
+
+## 🔬 Replicate Quality Control with **deepTools**
+
+This pipeline uses **deepTools** (e.g., `plotFingerprint`, `multiBamSummary`) to evaluate replicate quality.
+
+### ✅ Advantages of deepTools:
+
+-   🧪 **Modern and actively maintained** – compatible with recent Python environments
+-   📊 **Fingerprint and cross-correlation plots** – assess ChIP enrichment and background
+-   ⚙️ **Format flexibility** – supports BAM and BigWig
+-   🐳 **Container-friendly** – easy to integrate in Docker-based workflows
+-   📁 **Multi-sample analysis** – supports `multiBamSummary`, `plotCorrelation`
+
+Users can optionally replace this with **Relative Strand Correlation (RSC)** via the **ChIPQC R package** by editing the relevant module — showcasing the pipeline's modularity.
+
+
+### ❓ Why not use `phantompeakqualtools`?
+
+Although once widely used to assess replicate quality, `phantompeakqualtools` is now:
+
+-   🛑 Outdated and no longer actively maintained
+-   🐪 Depends on legacy Perl environments and outdated tools like CClang v5
+-   🧱 Hard to containerize or integrate into modern pipelines
+
+Therefore, it has been replaced by more maintainable alternatives in this workflow.
+
+
+### 📈 2. **Signal Generation**
+
+**Tools:**
+
+-   MACS3: Generates signal tracks (bedGraph or bigWig)
+-   BEDTools: For further manipulation
+
+**Outputs:**
+
+-   Signal p-value tracks
+-   Fold change over control tracks
+
+
+### 📍 3. **Peak Calling**
+
+**Performed on:**
+
+-   Individual replicates
+-   Pooled replicates
+-   Pseudoreplicates
+
+**Tools:**
+
+-   MACS3 or HOMER
+
+**Outputs:**
+
+-   Replicated peaks
+-   Pooled peaks
+-   Pseudoreplicated peaks
+
+
+### 📊 4. **IDR Analysis**
+
+**Tool:** [`idr`](https://github.com/nboley/idr) — used to assess peak reproducibility
+
+This pipeline uses a **patched IDR version** compatible with the latest `numpy`, avoiding the need to downgrade.
+
+
+### 🛠 Patch + Install IDR (NumPy Compatibility)
+
+```         
+bash
+    wget https://github.com/kundajelab/idr/archive/refs/tags/2.0.4.2.tar.gz && \
+    tar -xvf 2.0.4.2.tar.gz && \
+    cd idr-2.0.4.2/idr && \
+    sed -i 's/numpy.int/int/g' idr.py && \
+    cd .. && \
+    pip install . --break-system-packages && \
+    rm -rf /opt/idr-2.0.4.2 /opt/2.0.4.2.tar.gz
+```
+
+**Outputs:**
+
+-   IDR-ranked peaks
+-   IDR-thresholded peaks
+-   Conservative IDR peaks
+
+
+### 🔁 5. **Replicate/Partition Concordance**
+
+Assesses consistency of peaks across replicates and pseudoreplicates.
+
+
+### 🧾 6. **Format Conversion and Final Outputs**
+
+Covers conversion to final formats for visualization, downstream analysis, or submission.
+
+
+
+
+# installation
+
+title: "⚙️ Installation Guide"
+
+## 📦 Installation Overview
+
+This guide explains how to set up the ChIP-seq Modular Analysis Pipeline using:
+
+- ✅ Git clone (recommended)
+- 📁 `.tar.gz` or `.zip` archive download
+- 🐳 Docker (see [Docker Guide](docker_guide.qmd))
+- 🧪 Conda environments (see [Conda Setup](Conda.qmd))
+
+
+## 📂 Option 1: Clone from GitHub
+
+The most robust and update-safe method:
+
+```bash
+git clone https://github.com/your-username/your-repo.git
+cd your-repo
+````
+
+### ✅ Make Scripts Executable (already github executable commit, but in case)
+
+```bash
+chmod +x run_pipeline*.sh
+chmod +x modules/**/*.sh
+chmod +x modules/**/*.py
+chmod +x modules/**/*.R
+```
+
+
+## 📦 Option 2: Download Archive
+
+### 🔸 If you downloaded the `.tar.gz` version:
+
+```bash
+tar -xzvf your-pipeline.tar.gz
+cd your-pipeline
+```
+
+Scripts remain executable — no `chmod` needed.
+
+### ⚠️ If you downloaded the `.zip` version:
+
+```bash
+unzip your-pipeline.zip
+cd your-pipeline
+```
+
+Then run:
+
+```bash
+chmod +x run_pipeline*.sh
+chmod +x modules/**/*.sh
+chmod +x modules/**/*.py
+chmod +x modules/**/*.R
+```
+
+
+## ✅ Test the Installation
+
+Make sure the scripts work:
+
+```bash
+./run_pipeline1.sh --help
+./run_pipeline2.sh --help
+```
+
+
+## 📁 Expected File Structure
+
+```bash
+your-repo/
+├── run_pipeline1.sh
+├── run_pipeline2.sh
+├── modules/
+│   └── pipeline1/
+│   └── pipeline2/
+│   └── utils/
+├── metadata/
+├── Reference/
+├── analysis/
+└── ...
+```
+
+
+## 📚 Related Setup Pages
+
+* 📦 [Reference Setup](reference_setup.qmd)
+* 🧬 [Metadata & Mapping Format](mapping.qmd)
+* 🔧 [Software Requirements](software.qmd)
+* 🐳 [Docker Setup](docker_guide.qmd)
+* 🧪 [Conda Environment](Conda.qmd)
+
+
+## 📝 Notes
+
+If you encounter permission errors or missing dependencies, refer to [Troubleshooting](troubleshooting.qmd).
+
+```
+
+
+Let me know if you want to include a section for installing a local Conda environment (`environment.yml`) or a helper `install.sh`.
+```
+
+
+
+# reference setup
+
+title: "🧬 Initial documents and reference setups"
+## 🔧 Utilities
+
+The following helper scripts are available in the `modules/utils/` directory for setup and validation:
+
+### 🧬 `setup_reference.sh`
+
+Automates the preparation of **genome reference** directories and indexes.
+
+**Usage:**
+
+``` bash
+bash modules/utils/setup_reference.sh <GENOME_NAME> <GENOME_FASTA>
+```
+
+**Example:**
+
+``` bash
+bash modules/utils/setup_reference.sh hg38 /path/to/hg38.fa
+```
+
+**What it does:**
+
+-   Creates a genome folder under `resources/genomes/GENOME_NAME/`
+
+-   Generates:
+
+    -   `.fai` index via `samtools faidx`
+    -   `bwa` index (`bwa index`)
+    -   Chromosome sizes (`.chrom.sizes`)
+    -   Dictionary via `picard CreateSequenceDictionary`
+
+### 🐝 `setup_spikein_refs.sh`
+
+Prepares **spike-in reference genomes** similarly to the main genome.
+
+**Usage:**
+
+``` bash
+bash modules/utils/setup_spikein_refs.sh <SPIKE_NAME> <SPIKE_FASTA>
+```
+
+**Example:**
+
+``` bash
+bash modules/utils/setup_spikein_refs.sh dm6 /path/to/dm6.fa
+```
+
+**Creates:**
+
+-   Indexed `bwa` genome and dictionary for the spike
+-   Organized under `resources/spikein/SPIKE_NAME/`
+
+These scripts **must be run before alignment steps** in the pipeline to ensure all genome/spike references are available and indexed properly.
+
+Let me know if you’d like a Makefile target to wrap these commands for common genomes (e.g., hg38 + dm6).
+
+
+
+# pipeline1
+
+title: "🔄 Pipeline 1: QC & Preprocessing Modules"
+
+## 🔄 Pipeline 1: QC & Preprocessing Modules
+
+## 🧬 Supported Data Types
+
+This pipeline is designed for **ChIP-seq** and **ATAC-seq** data preprocessing. It includes:
+
+-   Adapter trimming (`cutadapt`)
+-   Parallel quality control (`FastQC`)
+-   Optional spike-in filtering
+-   Mitochondrial read removal
+-   Blacklist region filtering (ENCODE)
+-   Clean alignment with BWA and BAM post-processing
+
+By supporting these steps, the pipeline ensures high-quality, reproducible inputs for downstream peak calling or chromatin accessibility analysis.
+
+> 🔁 While optimized for ChIP-seq, the pipeline is fully compatible with ATAC-seq experiments.
+
+
+
+Scripts: `01_init_directories.sh` to `11_Renaming_bam.sh`
+
+``` bash
+modules/pipeline1\$ tree . 
+├── 01_init_directories.sh 
+├── 02_reference_check.sh 
+├── 03_input_fetch.sh 
+├── 04_fastqc_parallel.sh 
+├── 05_05_Cutadapt_trimming_phix_parallel.sh 
+├── 06_fastqc_trimmed_parallel.sh 
+├── 07_spike_detect.sh 
+├── 08_alignment_bwa_spike.sh 
+├── 09_readgroups_add.sh 
+├── 10_bam_cleaning.sh 
+├── 10_plot_spike_qc_summary.R 
+└── 11_Renaming_bam.sh
+```
+Great structure! Given the flow of your Quarto document, the best place to add the **usage documentation** for `run_pipeline1.sh` would be **after** the `## 🧬 Supported Data Types` section and **before** the `### 🔧 Modules` section.
+
+This keeps your document logically organized:
+
+1. **Intro**
+2. **What data it supports**
+3. **How to run it (Usage) ✅**
+4. **What each module does**
+5. **What the outputs are**
+
+
+### ✅ Suggested Update (add this block in your `.qmd` file):
+
+````markdown
+### 🚀 Usage: `run_pipeline1.sh`
+
+This script is the entry point for Pipeline 1 and supports both default and customized executions.
+
+#### ✅ Default Run
+
+Run with all defaults:
+```bash
+bash run_pipeline1.sh
+````
+
+This uses:
+
+* `THREADS = 4`
+* `REFERENCE = hg38`
+* `ADAPTER = tn5_truseq`
+* `PLATFORM = ILLUMINA`
+* `MAPPING = metadata/mapping.tsv`
+* `REPORT_FORMAT = human`
+
+#### 🔧 Full Custom Run
+
+Example of overriding all defaults:
+
+```bash
+bash run_pipeline1.sh -t 8 -r mm10 -a tn5_nextera -p IONTORRENT -m data/sample_metadata.tsv -f csv
+```
+
+Overrides:
+
+* `-t 8`: 8 threads
+* `-r mm10`: mouse genome
+* `-a tn5_nextera`: alternative adapter
+* `-p IONTORRENT`: sequencing platform
+* `-m data/sample_metadata.tsv`: custom mapping file
+* `-f csv`: report format
+
+#### ℹ️ Help
+
+For option details:
+
+```bash
+bash run_pipeline1.sh --help
+```
+
+
+### 🔧 Modules
+
+```{r, echo=FALSE,  results='asis'}
+library(knitr)
+library(kableExtra)
+library(magrittr)
+modules <- data.frame(
+  Script = c(
+    "01_init_directories.sh",
+    "02_reference_check.sh",
+    "03_input_fetch.sh",
+    "04_fastqc_parallel.sh",
+    "05_Cutadapt_trimming_phix_parallel.sh",
+    "06_fastqc_trimmed_parallel.sh",
+    "07_spike_detect.sh",
+    "08_alignment_bwa_spike.sh",
+    "09_readgroups_add.sh",
+    "10_bam_cleaning.sh",
+    "11_Renaming_bam.sh"
+  ),
+  Purpose = c(
+    "Creates necessary directory structure.",
+    "Validates presence of genome reference files.",
+    "Fetches and decompresses user-supplied FASTQ files.",
+    "Runs FastQC and generates quality reports.",
+    "Trims adapters and low-quality bases using Cutadapt.",
+    "Runs FastQC on trimmed reads.",
+    "Detects exogenous spike-in if not provided.",
+    "Aligns reads using BWA and checks spike content.",
+    "Adds read group metadata using Picard.",
+    "Cleans and indexes BAMs; performs spike-in QC.",
+    "Renames BAMs using mapping.tsv for grouping."
+  )
+)
+
+table<- kable(modules, 
+      format = "markdown",
+      caption = "<strong>🔧 Modules Overview</strong>",
+      align = c("l", "l")) %>%
+  kable_styling(bootstrap_options = c("striped", "hover"),    full_width = FALSE)
+table
+
+```
+
+### 📁 Output Folders
+
+results/: Raw outputs and intermediate files.
+
+analysis/Renamed_Cleaned: Cleaned and filtered BAMs for downstream usage.
+
+results/
+
+``` bash
+results/Filtered$ tree 
+
+├── BAM}
+├── Filtered
+├        ├── Cleaned  ✅ here are the cleaned BAM that will be renamed. │
+├        ├── Deduplicated
+├        └── Metrics
+├── QC_fastqc
+├── QC_spike_plots
+├── QC_trimmed_fastqc
+├── spike_analysis
+└── Trimmed
+```
+
+
+
+
+# pipeline2
+
+title: "🔄 Pipeline 2: Peak Calling, Reproducibility, and Functional Annotation"
+
+Pipeline2 continues the analysis after preprocessing and alignment, performing replicate QC, peak calling, and reproducibility evaluation via IDR. It supports both MACS3 and HOMER peak callers, with outputs from both individual and pooled replicates.
+
+During the IDR evaluation, a series of QC analyses is performed, and an HTML/PDF report is generated and stored at:
+
+```
+
+analysis/IDR\_Results/homer/IDR\_qc\_summary/
+
+````
+
+The report includes and are in HTML and pdf format:
+
+- 🧬 Spike-In Detection Summary  
+- 📊 Replicate QC Plots & 🖋️ Fingerprint Curves (Pre-IDR)  
+- 🧬 PCR Bottleneck Coefficient (PBC)  
+- 📈 IDR Evaluation Plots  
+- 📊 FRiP Scores from Initial Peak Calling  
+- 🔹 High-confidence Peak Metrics  
+- 🔹 Replicate Agreement (Rescue & Self-Consistency)  
+- 🔹 Jaccard Overlap (Replicate Peak Similarity)
+
+### 📎 Example Reports
+
+👉 **hg38**: [📎 View report (PDF)](files/hg38_idr_report.pdf)  
+👉 **mm10**: [📎 View report (PDF)](files/mm10_idr_report.pdf)
+
+In addition to nearest-gene TSS annotation using HOMER, the pipeline performs **functional enrichment analysis entirely locally** — without relying on online services. Enrichment is based on:
+
+
+-   Gene Ontology (GO): Biological Process (BP), Cellular Component (CC), Molecular Function (MF)
+- Gene Ontology (GO): BP, CC, MF  
+- KEGG pathways  
+- Reactome pathways  
+- g:Profiler (via the local `gprofiler2` R package)  
+- `clusterProfiler` and `org.*.eg.db` annotation databases for human and mouse
+
+The final summary file `PRE_POSSIBLE_OUTCOME.tsv` integrates gene annotations across conditions, identifying **shared (intersection)** and **unique (condition-specific)** signals.
+
+## 🧬 Functional Enrichment Report
+
+The final enrichment summary report (including Gene Ontology, KEGG, Reactome, and g:Profiler figures) is available as a downloadable PDF and HTML.
+If the PRE_POSSIBLE_OUTCOME.tsv file is too large, the PDF will include only the g:Profiler figures. The full PRE_POSSIBLE_OUTCOME.tsv content will remain available in its original TSV format and within the HTML report.
+
+### 📎 Example Reports
+
+👉 **hg38**: [📎 View report (PDF)](files/hg38_Functional_Enrichment_Report_plots_only.pdf)  
+👉 **mm10**: [📎 View report (PDF)](files/mm10_Functional_Enrichment_Report.pdf)
+
+
+
+
+### 🚀 Usage: `run_pipeline2.sh`
+
+This script runs **Pipeline 2** — performing peak calling, replicate QC, IDR analysis, and functional annotation using MACS3 and HOMER.
+
+#### ✅ Default Run
+
+Run with all default parameters:
+
+```bash
+bash run_pipeline2.sh
+```
+
+This will use:
+
+* `REFERENCE = hg38`
+* `MAPPING = metadata/mapping.tsv`
+* `PEAK_CALLER = both` (MACS3 and HOMER)
+* `THREADS = 4`
+* `IDR_THRESHOLD = 0.05`
+* `TARGET_RULES = templates/target_peak_rules.yaml`
+* `TSS_DB = HOMER` (for annotation)
+
+> ✅ Defaults are suitable for most **ChIP-seq** and **ATAC-seq** use cases.
+
+
+#### 🔧 Full Custom Run
+
+Customize all parameters:
+
+```bash
+bash run_pipeline2.sh \
+  -r mm10 \
+  -m data/sample_metadata.tsv \
+  -p macs3 \
+  -t 8 \
+  -i 0.01 \
+  -y templates/target_peak_rules_HOMER.yaml \
+  --tss-db clusterProfiler
+```
+
+Explanation:
+
+* `-r mm10` → Use mouse genome
+* `-m data/sample_metadata.tsv` → Custom metadata file
+* `-p macs3` → Use MACS3 only (can be `macs3`, `homer`, or `both`)
+* `-t 8` → Use 8 threads
+* `-i 0.01` → Adjust IDR threshold
+* `-y templates/target_peak_rules_HOMER.yaml` → Custom target rules
+* `--tss-db clusterProfiler` → Use `clusterProfiler` instead of HOMER for gene annotation.
+
+#### ℹ️ Help
+
+To see all options:
+
+```bash
+bash run_pipeline2.sh --help
+```
+### 📄 1. `mapping_schema.yaml` — Metadata Validation Rules
+
+Defines structure and validation logic for your `mapping.tsv` metadata.
+
+#### 🔍 Key Elements:
+
+-   **Required fields**: `Sample_ID`, `Instrument`, `Sample_Type`, `Condition`, `Replicate`, `Target`
+-   **Optional fields**: `Cell_line`, `Spike_Type`
+-   **Regex validation**: For fields like `Sample_Type`, `Replicate`
+
+#### ✅ Validate Schema File
+
+``` bash
+bash modules/utils/validate_mapping_yaml.sh templates/mapping_schema.yaml
+```
+#### ✅ Validate Metadata File
+
+```bash
+python3 modules/utils/validate_mapping.py \
+  --mapping metadata/mapping.tsv \
+  --schema templates/mapping_schema.yaml
+```
+
+
+### 📄 2. `target_peak_rules.yaml` — Peak Calling Styles (MACS3)
+
+This config determines which targets require **narrow** or **broad** peak calling.
+
+**Examples:**
+
+* `CTCF`, `MYC` → `narrowPeak`
+* `H3K27me3`, `EZH2` → `broadPeak`
+
+
+
+### 📄 3. `target_peak_rules_HOMER.yaml` — Peak Calling Styles (HOMER)
+
+Classifies targets by **style** for `findPeaks`:
+
+* `factor` → e.g., `MYC`, `SOX2`
+* `histone` → e.g., `H3K27me3`, `EZH2`
+* `GROseq`, `DNaseI`, etc.
+
+> ⚠️ Note: These files are pre-validated. If you add new targets, you must write your own validation.
+
+
+## 📊 Modules: `01_replicate_qc.sh` to `06_igv_snapshot.sh`
+
+```         
+modules/pipeline2/
+├── 01_replicate_qc.sh
+├── 02_merge_pseudoreplicates.sh
+├── 03_1_MACS3_peak_calling.sh
+├── 03_2_homer_peak_calling_fold_fdr_relaxed.sh
+├── 03_2_homer_to_peakFormat.R
+├── 03_3_MACS3_peak_calling_pooled_pseudoreps.sh
+├── 03_4_homer_peak_calling_pooled_pseudoreps.sh
+├── 04_plot_idr_summary.R
+├── 04_run_idr.sh
+├── 05_peak_annotation.sh
+├── 06_igv_snapshot.sh
+└── cluster_enrichment_updated_hg_mice.R
+```
+
+### 🔧 Modules
+
+| Script                                         | Purpose                                                                                        |
+|-------------------------|-----------------------------------------------|
+| `01_replicate_qc.sh`                           | Analyzes biological replicates for correlation (cutoff: 0.8), filters low-correlation samples. |
+| `02_merge_pseudoreplicates.sh`                 | Merges BAMs and creates pseudo-replicates for IDR.                                             |
+| `03_1_MACS3_peak_calling.sh`                   | Peak calling using MACS3 with smart baseline control matching.                                 |
+| `03_2_homer_peak_calling_fold_fdr_relaxed.sh`  | HOMER-based peak calling using `target_peak_rules_HOMER.yaml`.                                 |
+| `03_3_MACS3_peak_calling_pooled_pseudoreps.sh` | MACS3 peak calling for pooled/pseudo BAMs.                                                     |
+| `03_4_homer_peak_calling_pooled_pseudoreps.sh` | HOMER peak calling for pooled/pseudo BAMs.                                                     |
+| `04_run_idr.sh`                                | Runs IDR on replicate pairs, pooled vs individual, etc.                                        |
+| `05_peak_annotation.sh`                        | Performs TSS annotation of peak files.                                                         |
+| `06_igv_snapshot.sh`                           | Generates IGV snapshots for peak visualization.                                                |
+|                                                |                                                                                                |
+
+> ⚠️ Note :06_igv_snapshot.sh is an extra module not yet adapted to the pipeline. This particular script produce to many snapshots if the user do not define the peaks based on their needs. ------------------------------------------------------------------------
+
+## 🗂 Analysis Folder Structure
+
+```         
+analysis$ tree -L 1
+.
+├── BAM_replicate_fail
+├── ChIPseeker_TSS_Hommer_IDR_annotation
+├── IDR_Results
+│   ├── homer
+│   └── macs3
+├── PeakCalling_HOMER
+├── PeakCalling_HOMER_pool_pseudo
+├── PeakCalling_MACS3
+├── PeakCalling_MACS3_pool_pseudo
+├── Pooled_BAMs
+├── pooling_log.tsv
+├── Pool_Pseudo_QC_stats
+├── Pseudoreplicates
+├── Renamed_Cleaned
+└── Replicate_QC
+    ├── bigwig
+    ├── deeptools
+    ├── pbc_metrics.tsv
+    └── tmp_groups
+```
+
+
+
+# mapping
+
+title: "Preprocessing Modules"
+
+## 🗺️ Creating the `mapping.tsv` File (Metadata Table)
+
+The metadata file is crucial for automating sample grouping, identifying replicates, and selecting the appropriate peak caller.
+
+> 🧠 **Filename required:** `metadata/mapping.tsv`
+
+### ✅ Required Columns
+
++---------------+---------------------------------------+-------------------+
+| Column        | Description                           | Example           |
++===============+=======================================+===================+
+| `Sample_ID`   | Unique ID matching FASTQ or BAM files | `SRR123456`       |
++---------------+---------------------------------------+-------------------+
+| `Instrument`  | Sequencing instrument or platform     | `Illumina`        |
++---------------+---------------------------------------+-------------------+
+| `Sample_Type` | `ChIP`, `Input`, `IgG`, `Mock`, etc.  | `ChIP`            |
++---------------+---------------------------------------+-------------------+
+| `Condition`   | Experimental condition or group       | `Treated`, `WT`   |
++---------------+---------------------------------------+-------------------+
+| `Replicate`   | Replicate number (`1`, `2`, `3`, ...) | `1`               |
++---------------+---------------------------------------+-------------------+
+| `Target`      | Transcription factor or histone mark  | `H3K27ac`, `CTCF` |
++---------------+---------------------------------------+-------------------+
+
+### 📝 Optional Columns
+
+| Column       | Description                               | Example  |
+|--------------|-------------------------------------------|----------|
+| `Cell_line`  | Cell line used                            | `HEK293` |
+| `Spike_Type` | If spike-in is used (e.g., `dm6`, `ERCC`) | `dm6`    |
+
+### 📁 Example Structure
+
+``` tsv
+Sample_ID   Instrument  Sample_Type Condition   Replicate   Target  Cell_line   Spike_Type
+SRR001      Illumina    ChIP        WT          1         CTCF       HEK293     dm6
+SRR002      Illumina    ChIP        WT          2         CTCF       HEK293     dm6
+SRR003      Illumina    Input       WT          1         None       HEK293     dm6
+SRR004      Illumina    ChIP        KO          1         H3K27me3   HEK293     dm6
+SRR005      Illumina    ChIP        KO          2         H3K27me3   HEK293     dm6
+SRR006      Illumina    Input       KO          1         None       HEK293     dm6
+```
+
+
+### 🧪 Validation Steps
+
+Make sure your file is valid before starting the pipeline:
+
+1.  **Validate schema:**
+
+``` bash
+bash modules/utils/validate_mapping_yaml.sh templates/mapping_schema.yaml
+```
+
+2.  **Validate metadata:**
+
+``` bash
+python3 modules/utils/validate_mapping.py \
+  --mapping metadata/mapping.tsv \
+  --schema templates/mapping_schema.yaml
+```
+
+✔️ You should see “Validation Passed” if everything is correct.
+
+## 📋 What is `mapping.tsv` and Why Is It Important?
+
+### 🔍 What is it?
+
+The `mapping.tsv` is a **metadata table**—a plain text file in tab-separated format—that contains structured information about each sample in your ChIP-seq experiment. Each row represents a sequencing sample, and each column provides key attributes (e.g., sample ID, condition, replicate number, target protein, etc.).
+
+This file needs to be stored at:
+
+```         
+metadata/mapping.tsv
+```
+
+This mapping table will be transformed during the pipeline process: at then you will have a backup (mapping.tsv.bak), mapping_filtered.tsv (produce after replicates QC), and mapping_scaled.tsv (produced after bam cleaning, it contains the ratio of exogenous spike , if spike was detected, and the spike genome type).
+
+### 🧠 Why is it needed?
+
+This file is **critical** for enabling your pipeline to:
+
+✅ **Recognize and organize samples** automatically ✅ **Group replicates** (for IDR and reproducibility checks) ✅ **Assign controls** (Input, IgG, Mock) correctly for peak calling ✅ **Select peak caller styles** (e.g., narrowPeak for TFs, broadPeak for histone marks) ✅ **Validate input consistency** using the YAML schema
+
+Without this file, the pipeline wouldn’t know how your samples relate to each other—or how to process them correctly.
+
+### 🔗 How does the pipeline use it?
+
+-   **Pipeline 1:** The script `11_Renaming_bam.sh` uses the metadata to automatically rename BAM files and organize them into logical groups.
+
+-   **Pipeline 2:** Several scripts (e.g., `01_replicate_qc.sh`, `03_1_MACS3_peak_calling.sh`) read `mapping.tsv` to apply the right rules for:
+
+    -   Sample pairing (ChIP vs. Input)
+    -   Replicate merging
+    -   Peak calling type
+    -   Reproducibility evaluation (IDR)
+
+-   **Validation scripts** (`validate_mapping.py`, `validate_mapping_yaml.sh`) ensure the file is complete and follows strict format rules before any analysis starts.
+
+### 🧬 Summary
+
++-------------------------+------------------------------------------------------------+
+| Feature                 | Why it matters                                             |
++=========================+============================================================+
+| **Automation**          | Removes manual handling of sample groups                   |
++-------------------------+------------------------------------------------------------+
+| **Reproducibility**     | Ensures the same logic applies every time                  |
++-------------------------+------------------------------------------------------------+
+| **Compatibility**       | Lets the pipeline work across diverse experimental designs |
++-------------------------+------------------------------------------------------------+
+| **Quality control**     | Prevents broken analyses due to misannotated samples       |
++-------------------------+------------------------------------------------------------+
+
+
+
+# docker pipeline1
+
+title: "🐳 Running Pipeline1 with Docker"
+
+## 🏃 Running Pipeline1 with Docker
+
+🐳 Docker Usage Guide
+
+This guide explains **how to build and run** the ChIP-seq processing pipeline using Docker. It is designed for users at all levels, including beginners.
+
+While the original pipeline was created to work directly in Host-based installation, the pipeline can be used with docker containers and mounting the required folder needed for the package This pipeline is fully containerized and can be run with a single Docker command. Below is the recommended usage to **preserve outputs**, access your own data, and avoid re-downloading references.
+
+
+### 🔧 Docker Requirements
+
+-   Docker installed and working (`docker --version`)
+
+-   Your working directory should contain:
+
+    -   `Reference/` — genome files (e.g. `hg38`, `mm10`, etc.)
+    -   `metadata/` — sample sheet (`SRR_Acc_List.txt`, etc.)
+    -   `samples/` — (optional) pre-existing FASTQs
+    -   `results/` — (created if missing) final output goes here
+    -   `logs/` — (created if missing) all logs go here
+
+
+### 🧪 Run Command (Example)
+
+``` bash
+docker run --rm \
+  -v "$PWD/Reference":/pipeline/Reference \
+  -v "$PWD/SpikeinReference":/pipeline/SpikeinReference \
+  -v "$PWD/metadata":/pipeline/metadata \
+  -v "$PWD/samples":/pipeline/samples \
+  -v "$PWD/results":/pipeline/results \
+  -v "$PWD/logs":/pipeline/logs \
+  -v "$PWD/logs":/pipeline/assets \
+  pipeline1:latest -t 4 -r mm10 -a tn5_truseq
+```
+
+
+### 📝 Explanation
+
++-------------------------+-----------------------------------------------------+
+| Option                  | Description                                         |
++=========================+=====================================================+
+| `--rm`                  | Removes container after run                         |
++-------------------------+-----------------------------------------------------+
+| `-v <host>:<container>` | Mounts folders into container                       |
++-------------------------+-----------------------------------------------------+
+| `-t 4`                  | Number of threads                                   |
++-------------------------+-----------------------------------------------------+
+| `-r mm10`               | Reference genome (`hg38`, `mm10`, etc.)             |
++-------------------------+-----------------------------------------------------+
+| `-a tn5_truseq`         | Adapter type (should match what's in your pipeline) |
++-------------------------+-----------------------------------------------------+
+| `pipeline1:latest`      | Docker image name                                   |
++-------------------------+-----------------------------------------------------+
+
+
+### 📂 Output
+
+All outputs go into your local `results/` and `logs/` folders — no data is lost after the container exits.
+
+
+
+# docker pipeline2
+
+title: "🐳 Running Pipeline2 with Docker"
+
+
+### 👷‍️⛏️ 1. Build the Docker Image
+
+From the folder containing `Dockerfile.pipeline2`, run:
+
+``` bash
+docker build -f Dockerfile.pipeline2 -t pipeline2-image .
+```
+
+-   `-f`: specifies the Dockerfile to use.
+-   `-t`: tags the image name as `pipeline2-image`.
+-   `.`: tells Docker to build using the current directory context.
+
+
+### 📁 2. Project Structure
+
+A typical folder layout:
+
+```         
+your_project/
+├── run_pipeline2.sh
+├── modules/
+│   └── pipeline2/
+├── metadata/
+├── Reference/
+├── templates/
+├── logs/
+├── analysis/           # Will be populated by the pipeline
+```
+
+Ensure all these folders exist, especially `Reference/`, `metadata/`, and `modules/`.
+
+
+### 🗃️ 3. Mounting Folders
+
+To give Docker access to your files, bind-mount these folders:
+
++-------------------------------------------------------------------------------------+------------------------+-------------------------------------+
+| Host Path                                                                           | Docker Path            | Reason                              |
++=====================================================================================+========================+=====================================+
+| `$PWD`                                                                              | `/pipeline2`           | Root of your pipeline package       |
++-------------------------------------------------------------------------------------+------------------------+-------------------------------------+
+| `$PWD/Reference`                                                                    | `/pipeline2/Reference` | Genome files (FASTA, GTF, BED)      |
++-------------------------------------------------------------------------------------+------------------------+-------------------------------------+
+| `$PWD/metadata`                                                                     | `/pipeline2/metadata`  | Sample metadata for input           |
++-------------------------------------------------------------------------------------+------------------------+-------------------------------------+
+| `$PWD/templates`                                                                    | `/pipeline2/templates` | Mapping schema, rules               |
++-------------------------------------------------------------------------------------+------------------------+-------------------------------------+
+| `$PWD/logs`                                                                         | `/pipeline2/logs`      | Store logs                          |
++-------------------------------------------------------------------------------------+------------------------+-------------------------------------+
+| `$PWD/analysis`                                                                     | `/pipeline2/analysis`  | All analysis results are saved here |
++-------------------------------------------------------------------------------------+------------------------+-------------------------------------+
+| `$PWD/assets`                                                                       | `/pipeline2/assets`    | Contains images icon for the IDR    |
++-------------------------------------------------------------------------------------+------------------------+-------------------------------------+
+|                                                                                     |                        | report. Can be changed by user      |
++-------------------------------------------------------------------------------------+------------------------+-------------------------------------+
+| ----------------------------------------------------------------------------------- |                        |                                     |
++-------------------------------------------------------------------------------------+------------------------+-------------------------------------+
+
+### 🏃 4. Run the Pipeline
+
+Example command:
+
+``` bash
+docker run --rm \
+  -v "$PWD:/pipeline2" \
+  -v "$PWD/Reference:/pipeline2/Reference" \
+  -v "$PWD/metadata:/pipeline2/metadata" \
+  -v "$PWD/templates:/pipeline2/templates" \
+  -v "$PWD/logs:/pipeline2/logs" \
+  -v "$PWD/analysis:/pipeline2/analysis" \
+  -w /pipeline2 \
+  pipeline2-image \
+  bash run_pipeline2.sh --caller macs3 -genome mm10
+```
+
+
+### 📦 5. Output Files
+
+After running, the results will be in:
+
+-   `analysis/` — contains pipeline outputs and QC summaries
+-   `logs/` — contains module-specific logs
+-   `metadata/mapping_filtered_IDR.tsv` — filtered metadata after validation
+
+
+### 🛠️️️ 6. Optional: Helper Shell Script
+
+Create a script like `run.sh`:
+
+``` bash
+#!/bin/bash
+docker run --rm \
+  -v "$PWD:/pipeline2" \
+  -v "$PWD/Reference:/pipeline2/Reference" \
+  -v "$PWD/metadata:/pipeline2/metadata" \
+  -v "$PWD/templates:/pipeline2/templates" \
+  -v "$PWD/logs:/pipeline2/logs" \
+  -v "$PWD/analysis:/pipeline2/analysis" \
+  -w /pipeline2 \
+  pipeline2-image \
+  bash run_pipeline2.sh "$@"
+```
+
+Then run it like this:
+
+``` bash
+chmod +x run.sh
+./run.sh --caller homer -genome mm10
+```
+
+
+
+# docker guide
+
+title: " 🐳 Docker guide"
+
+Docker provides a reproducible, isolated environment for running the pipeline. Once the image is built, the entire analysis can be executed without requiring local software installations.
+
+### ⚙️ Running the Pipeline in Docker
+
+Use the following command to launch the container:
+
+```bash
+docker run -v "$PWD:/pipeline2" -w /pipeline2 pipeline2-image \
+  bash run_pipeline2.sh [options]
+```
+
+This command:
+
+- Mounts your current directory (`$PWD`) into the container at `/pipeline2`
+- Sets `/pipeline2` as the working directory
+- Executes the pipeline script inside the container
+
+### 📁 Project Structure Inside the Container
+
+Your pipeline files are accessible under:
+
+```
+/pipeline2/
+├── run_pipeline2.sh
+├── modules/pipeline2/
+├── metadata/
+├── Reference/
+├── logs/
+├── analysis/
+```
+
+Relative paths like `modules/pipeline2/04_run_idr.sh` will resolve correctly.
+
+
+### 🔗 Docker Command Summary
+
+| Step              | Command                                                                 |
+|-------------------|-------------------------------------------------------------------------|
+| **Build image**   | `docker build -f Dockerfile.pipeline2 -t pipeline2-image .`             |
+| **Run pipeline**  | `docker run -v "$PWD:/pipeline2" -w /pipeline2 pipeline2-image ...`     |
+| **View results**  | Check output files in your local `analysis/` and `logs/` directories    |
+
+
+For advanced options or troubleshooting, refer to the main documentation or contact the maintainers.
+
+
+
+# Conda
+
+title: "🐍 Core enviroment:conda"
+
+### ✅ 1. `env_pipeline_base.yml` — Core environment
+
+Below are two separate **Conda environment YAML files**:
+
+This includes all necessary packages for running the pipeline in a non-Docker setup, excluding R packages and HOMER.
+
+``` yaml
+name: chipseq_pipeline_base
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.9
+  - pip
+  - numpy
+  - pandas
+  - pyyaml
+  - samtools>=1.14
+  - bedtools>=2.30.0
+  - bwa
+  - cutadapt>=4.0
+  - macs3
+  - deeptools
+  - jq
+  - r-base=4.2
+  - r-data.table
+  - r-ggplot2
+  - r-dplyr
+  - r-readr
+  - r-tidyr
+  - r-stringr
+  - r-jsonlite
+  - r-httr
+  - r-remotes  # for installing from GitHub
+  - pip:
+      - idr  # we patch it manually later
+```
+
+
+### ✅ 2. `env_pipeline_r.yml` — Optional: R + Bioconductor setup
+
+Use this to install additional R packages (run after activating `chipseq_pipeline_base`):
+
+``` r
+# In R
+if (!requireNamespace("BiocManager", quietly = TRUE))
+  install.packages("BiocManager")
+
+BiocManager::install(c(
+  "AnnotationDbi",
+  "clusterProfiler",
+  "enrichplot",
+  "ReactomePA",
+  "reactome.db",
+  "biomaRt",
+  "org.Mm.eg.db",   # for mouse
+  "org.Hs.eg.db"    # for human
+))
+```
+
+
+## ⚙️ Software Requirements (Non-Docker Setup)
+
+While this pipeline is fully Docker-compatible, you can also run it natively by installing the required software through **🐍 Conda** and **📘 ℝ** .
+
+### 📁 Environment Files
+
+All environment setup files are located in:
+
+``` bash
+env/
+├── env_pipeline_base.yml     # Conda YAML file (base system + CLI tools)
+├── env_pipeline_r.R          # R script to install required R/Bioconductor packages
+```
+
+### 🧪 Step 1: Create Conda Environment
+
+Use the provided YAML file to create a clean Conda environment with all the command-line tools.
+
+``` bash
+conda env create -f env/env_pipeline_base.yml
+conda activate chipseq_pipeline_base
+```
+
+### 📦 Step 2: Install R and Bioconductor Packages
+
+Once inside the conda environment, install the required R packages using:
+
+``` bash
+Rscript env/env_pipeline_r.R
+```
+
+This script will:
+
+-   Check for missing CRAN or Bioconductor dependencies
+-   Install them as needed
+-   Load the correct annotation packages for both human (hg38) and mouse (mm10) genomes
+
+### 🧰 Tool Dependencies
+
+Some tools like `picard.jar` and `qualimap` are **not installed via Conda** but are required. These are bundled inside the pipeline under:
+
+``` bash
+tools/
+├── picard.jar      # Required for BAM metadata tagging
+├── qualimap/       # For BAM quality metrics (must be Java-compatible)
+```
+
+Make sure:
+
+-   `tools/picard.jar` is accessible (used by `AddOrReplaceReadGroups`)
+-   `tools/qualimap/` is executable and on your `PATH` or referenced directly by the scripts
+
+Ensure these are available in your environment or adjust the relevant paths in the pipeline scripts.
+
+🐳 Or Use Docker For reference, installation steps are also reflected in the Dockerfiles:
+
+bash Copy Edit Dockerfile.pipeline1 Dockerfile.pipeline2 These show the exact installation process and can be adapted for manual setup if needed.
+
+
+# software
+
+title: " 🧰 Software Requirements (Non-Docker Setup)"
+
+## 🧰 Software Requirements (Non-Docker Setup)
+
+If you're running the pipeline without Docker, your system must have the following tools installed and available in your PATH — except for picard.jar and qualimap, which are already bundled in the pipeline under tools/ and should remain there.
+
+### 📦 Core Requirements
+
+Install the following tools via your package manager (`apt`, `brew`, `conda`, etc.) or from source as needed:
+
++----------------+-------------------+-------------------------------------+
+| Tool           | Minimum Version   | Purpose                             |
++================+===================+=====================================+
+| `bash`         | 4.0+              | Shell scripting                     |
++----------------+-------------------+-------------------------------------+
+| `cutadapt`     | 4.0+              | Adapter trimming                    |
++----------------+-------------------+-------------------------------------+
+| `bwa`          | 0.7.17+           | Read alignment                      |
++----------------+-------------------+-------------------------------------+
+| `samtools`     | 1.14+             | BAM/SAM manipulation                |
++----------------+-------------------+-------------------------------------+
+| `picard`       | 2.26.10+          | BAM post-processing                 |
++----------------+-------------------+-------------------------------------+
+| `macs3`        | 3.0.0a6+          | Peak calling                        |
++----------------+-------------------+-------------------------------------+
+| `homer`        | v4.11+            | Alternative peak calling            |
++----------------+-------------------+-------------------------------------+
+| `python3`      | 3.9+              | Used for helper scripts             |
++----------------+-------------------+-------------------------------------+
+| `pip`          | Latest            | Python package management           |
++----------------+-------------------+-------------------------------------+
+| `R`            | 4.2+              | Statistical computing environment   |
++----------------+-------------------+-------------------------------------+
+| `Rscript`      | 4.2+              | Script execution for R modules      |
++----------------+-------------------+-------------------------------------+
+| `bedtools`     | 2.30.0+           | Genomic interval operations         |
++----------------+-------------------+-------------------------------------+
+| `deepTools`    | 3.5.1+            | QC and coverage tools               |
++----------------+-------------------+-------------------------------------+
+| `idr`          | 2.0.4.2 (patched) | Peak reproducibility scoring        |
++----------------+-------------------+-------------------------------------+
+| `jq`           | 1.6+              | JSON parsing (metadata scripts)     |
++----------------+-------------------+-------------------------------------+
+| `wget`/`curl`  | any               | Data downloading                    |
++----------------+-------------------+-------------------------------------+
+| `yq`           | 4.0+              | YAML parsing and editing (Go-based) |
++----------------+-------------------+-------------------------------------+
+
+### 📚 Required Python Packages
+
+Install with:
+
+``` bash
+pip install numpy pandas pyyaml
+```
+
+### 📚 Required R Packages
+
+Your pipeline includes scripts that require the following **CRAN** and **Bioconductor** packages:
+
+#### From CRAN:
+
+-   `dplyr`
+-   `ggplot2`
+-   `tidyr`
+-   `data.table`
+-   `readr`
+-   `stringr`
+-   `tools`
+-   `jsonlite`
+-   `httr`
+
+#### From Bioconductor:
+
+-   `clusterProfiler`
+-   `enrichplot`
+-   `ReactomePA`
+-   `reactome.db`
+-   `biomaRt`
+-   `AnnotationDbi`
+-   `org.Hs.eg.db`
+-   `org.Mm.eg.db`
+
+> ✅ The R scripts automatically attempt to install missing packages if your internet connection is available.
+
+### 🧬 Optional (for full compatibility)
+
+-   `FastQC`
+-   `MultiQC`
+-   `IGV` (for manual visualization)
+-   `docker` (if you'd like to use pre-built containers)
+
+
+
+# troubleshooting
+
+title: "Troubleshooting"
+❗ **Troubleshooting / FAQ"**
+
+1.  🔍 Metadata Validation Fails
+
+2.  🛑 IDR Errors: NumPy or Missing Peaks
+
+3.  ⚠️ Docker Mount Issues Troubleshooting & FAQ \*\*
+
+4.  🔍 Metadata Validation Fails
+
+5.  🛑 IDR Errors: NumPy or Missing Peaks 4.3 ⚠️ Docker Mount Issues
+
+
+
+# citations
+
+title: "📚 Tool Citations"
+
+We respectfully acknowledge the following software used in this pipeline:
+
+-   **Cutadapt** — Martin (2011) [DOI: 10.14806/ej.17.1.200](https://doi.org/10.14806/ej.17.1.200)\
+-   **BWA** — Li and Durbin (2009) [PMID: 19451168](https://pubmed.ncbi.nlm.nih.gov/19451168/)\
+-   **SAMtools** — Li et al. (2009) [PMID: 19505943](https://pubmed.ncbi.nlm.nih.gov/19505943/)\
+-   **MACS3** — Zhang et al. (2008) [PMID: 18798982](https://pubmed.ncbi.nlm.nih.gov/18798982/)\
+-   **HOMER** — Heinz et al. (2010) [PMID: 20513432](https://pubmed.ncbi.nlm.nih.gov/20513432/)\
+-   **Picard** — Broad Institute <https://broadinstitute.github.io/picard/>\
+-   **deepTools** — Ramírez et al. (2016) [PMID: 27079975](https://pubmed.ncbi.nlm.nih.gov/27079975/)\
+-   **Qualimap** — Okonechnikov et al. (2016) [PMID: 27040156](https://pubmed.ncbi.nlm.nih.gov/27040156/)\
+-   **IDR** — Li et al. (2011) [PMID: 21300883](https://pubmed.ncbi.nlm.nih.gov/21300883/)\
+-   **clusterProfiler** — Yu et al. (2012) [PMID: 22455463](https://pubmed.ncbi.nlm.nih.gov/22455463/)\
+-   **ReactomePA** — Yu and He (2016) [PMID: 27480138](https://pubmed.ncbi.nlm.nih.gov/27480138/)\
+-   **yq** — Mike Farah (v4+), GitHub: <https://github.com/mikefarah/yq>
+
+And others listed in the software requirements section above.
+
+> ⚠️ For academic use, please cite the original tools if you rely on results from this pipeline.
+
+
+# license
+
+title: "📄 MIT License"
+
+MIT License
+============
+
+Copyright (c) 2025 Nancy Anderson
+
+Permission is hereby granted, free of charge, to any person obtaining a copy  
+of this software and associated documentation files (the "Software"), to deal  
+in the Software without restriction, including without limitation the rights  
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell  
+copies of the Software, and to permit persons to whom the Software is  
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all  
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR  
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,  
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE  
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER  
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,  
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE  
+SOFTWARE.
+
+

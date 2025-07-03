@@ -1,0 +1,54 @@
+cd chip-seq-modular-pipeline
+docker build -f Docker/Dockerfile.pipeline1 -t pipeline1-test .
+
+
+✅ 1. Docker Command with Defaults Only
+
+
+docker run --rm -it \
+  -v "$PWD/samples:/pipeline/samples" \
+  -v "$PWD/Reference:/pipeline/Reference" \
+  -v "$PWD/SpikeinReference:/pipeline/SpikeinReference" \
+  -v "$PWD/metadata:/pipeline/metadata" \
+  -v "$PWD/templates:/pipeline/templates" \
+  -v "$PWD/adapters:/pipeline/adapters" \
+  -v "$PWD/assets:/pipeline/assets" \
+  -v "$PWD/modules:/pipeline/modules" \
+  -v "$PWD/results:/pipeline/results" \
+  -v "$PWD/analysis:/pipeline/analysis" \
+  pipeline1-test bash run_pipeline1.sh
+  This runs the pipeline with:
+
+THREADS=4
+
+REFERENCE=hg38
+
+ADAPTER=tn5_truseq
+
+PLATFORM=ILLUMINA
+
+MAPPING=metadata/mapping.tsv
+
+REPORT_FORMAT=human
+
+
+ ⚙️ 2. Docker Command with All Options Provided
+docker run --rm -it \
+  -v "$PWD/samples:/pipeline/samples" \
+  -v "$PWD/Reference:/pipeline/Reference" \
+  -v "$PWD/SpikeinReference:/pipeline/SpikeinReference" \
+  -v "$PWD/metadata:/pipeline/metadata" \
+  -v "$PWD/templates:/pipeline/templates" \
+  -v "$PWD/adapters:/pipeline/adapters" \
+  -v "$PWD/assets:/pipeline/assets" \
+  -v "$PWD/modules:/pipeline/modules" \
+  -v "$PWD/results:/pipeline/results" \
+  -v "$PWD/analysis:/pipeline/analysis" \
+  pipeline1-test bash run_pipeline1.sh \
+    -t 8 \
+    -r mm10 \
+    -a tn5_nextera \
+    -p IONTORRENT \
+    -m metadata/mapping.tsv \
+    -f csv
+

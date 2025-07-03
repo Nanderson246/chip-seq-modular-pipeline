@@ -79,5 +79,14 @@
   },
   "content/installation.qmd": {
     "installation.html": "8f6e92d3"
+  },
+  "docker1_table.md": {
+    "docker1_table.html": "2f7b09ad"
+  },
+  "wiki_combined.Rmd": {
+    "wiki_combined.html": "e89060f3"
+  },
+  "Built and mount docker inside thepackage.rmd": {
+    "Built and mount docker inside thepackage.html": "71d45c6d"
   }
 }

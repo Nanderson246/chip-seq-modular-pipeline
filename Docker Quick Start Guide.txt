@@ -1,0 +1,127 @@
+
+---
+
+## 🐳 Docker Quick Start Guide – *ChIP-seq Modular Pipeline 1*
+
+### 📦 What Is This?
+
+This guide explains how to build and run the `pipeline1` container for this project using [Docker](https://www.docker.com/). It's written to be beginner-friendly and honest about what's actually happening.
+
+---
+
+### ✅ Prerequisites
+
+Before you begin, ensure you have:
+
+* [Docker installed](https://docs.docker.com/get-docker/) on your system
+* A terminal open in the root of the project: `chip-seq-modular-pipeline/`
+
+---
+
+### 🏗️ Step 1: Build the Docker Image
+
+Run this from the **project root**:
+
+```bash
+docker build -f Docker/Dockerfile.pipeline1 -t pipeline1-test .
+```
+
+* `-f` tells Docker where your custom Dockerfile is
+* `-t pipeline1-test` gives your image a name
+* `.` means “use this current folder as the build context”
+
+> ⏱️ This step may take several minutes the first time.
+
+---
+
+### 🗂 Step 2: Required Folder Structure
+
+The container will **mount** folders from your host system. These are used as inputs/outputs:
+
+| Folder on Host      | Purpose                          |
+| ------------------- | -------------------------------- |
+| `samples/`          | Raw sequencing data              |
+| `Reference/`        | Genome files                     |
+| `SpikeinReference/` | Spike-in reference configs       |
+| `metadata/`         | Sample info and mapping file     |
+| `templates/`        | YAML and TSV templates           |
+| `adapters/`         | Adapter sequences                |
+| `assets/`           | Logos, icons, etc.               |
+| `modules/`          | All pipeline scripts             |
+| `results/`          | Created during pipeline1         |
+| `analysis/`         | Final output — used by pipeline2 |
+
+> If `results/` or `analysis/` don't exist yet, Docker will create them automatically.
+
+---
+
+### ▶️ Step 3: Run the Pipeline — With Defaults
+
+This will run `run_pipeline1.sh` with all default values (e.g., `hg38`, 4 threads):
+
+```bash
+docker run --rm -it \
+  -v "$PWD/samples:/pipeline/samples" \
+  -v "$PWD/Reference:/pipeline/Reference" \
+  -v "$PWD/SpikeinReference:/pipeline/SpikeinReference" \
+  -v "$PWD/metadata:/pipeline/metadata" \
+  -v "$PWD/templates:/pipeline/templates" \
+  -v "$PWD/adapters:/pipeline/adapters" \
+  -v "$PWD/assets:/pipeline/assets" \
+  -v "$PWD/modules:/pipeline/modules" \
+  -v "$PWD/results:/pipeline/results" \
+  -v "$PWD/analysis:/pipeline/analysis" \
+  pipeline1-test bash run_pipeline1.sh
+```
+
+---
+
+### ⚙️ Step 4: Run with Custom Options
+
+Example with custom flags:
+
+```bash
+docker run --rm -it \
+  -v "$PWD/samples:/pipeline/samples" \
+  -v "$PWD/Reference:/pipeline/Reference" \
+  -v "$PWD/SpikeinReference:/pipeline/SpikeinReference" \
+  -v "$PWD/metadata:/pipeline/metadata" \
+  -v "$PWD/templates:/pipeline/templates" \
+  -v "$PWD/adapters:/pipeline/adapters" \
+  -v "$PWD/assets:/pipeline/assets" \
+  -v "$PWD/modules:/pipeline/modules" \
+  -v "$PWD/results:/pipeline/results" \
+  -v "$PWD/analysis:/pipeline/analysis" \
+  pipeline1-test bash run_pipeline1.sh \
+    -t 8 \
+    -r mm10 \
+    -a tn5_nextera \
+    -p IONTORRENT \
+    -m metadata/mapping.tsv \
+    -f csv
+```
+
+---
+
+### 🧼 Notes & Troubleshooting
+
+* **Do not build or run Docker from a different folder**, or it may break `COPY` paths or volume mounts.
+* You **must mount** folders if you want outputs to persist after the container exits.
+* If something doesn’t work, add `-e` to the script or drop into the container:
+
+```bash
+docker run --rm -it pipeline1-test
+```
+
+> From there, you can run `bash run_pipeline1.sh` manually and debug step-by-step.
+
+---
+
+Would you like me to also:
+
+* Format this into Markdown (`.md`) or Quarto (`.qmd`)?
+* Write a similar section for `pipeline2`?
+* Create a helper shell script (`run_pipeline1_docker.sh`) for easier reuse?
+
+Just say the word — you're doing great.
+
