@@ -1,5 +1,5 @@
 # ------------------------------------------------------------------------------
-# Dockerfile for pipeline1
+# Dockerfile for pipeline2
 # Maintainer: Nancy Anderson
 # Base: Ubuntu with bioinformatics & R packages
 # ------------------------------------------------------------------------------
@@ -10,11 +10,18 @@ LABEL maintainer="Nancy Anderson <n.anderson@comcast.net>" \
       version="2.0" \
       description="Docker container for ChIP-seq pipeline2 with HOMER, MACS3, IDR, and DeepTools support"
 
-# Use non-interactive mode for apt
-ENV DEBIAN_FRONTEND=noninteractive
+# ------------------------------------------------------------------------------
+# Use non-interactive mode for apt & UTF-8 locale
+# ------------------------------------------------------------------------------
+ENV DEBIAN_FRONTEND=noninteractive \
+    LANG=en_US.UTF-8 \
+    LC_ALL=en_US.UTF-8 \
+    PATH="/pipeline/tools:$PATH"
 
+# ------------------------------------------------------------------------------
 # === System + Core utilities ===
-RUN apt-get update && apt-get install -y \
+# ------------------------------------------------------------------------------
+RUN apt-get update && apt-get install -y --no-install-recommends \
     bash \
     build-essential \
     wget \
@@ -23,8 +30,8 @@ RUN apt-get update && apt-get install -y \
     python3 \
     python3-dev \
     python3-pip \
-    cython3 \
     r-base \
+    cython3 \
     bedtools \
     samtools \
     bc \
@@ -33,66 +40,76 @@ RUN apt-get update && apt-get install -y \
     libcurl4-openssl-dev \
     libxml2-dev \
     libssl-dev \
+    locales \
     fonts-dejavu \
     libfontconfig1 \
-    zlib1g-dev && \
-    apt-get clean && rm -rf /var/lib/apt/lists/*
-    
-# === Locale configuration (UTF-8) ===
-RUN apt-get update && \
-    apt-get install -y locales && \
-    echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && \
+    zlib1g-dev \
+    python3-setuptools \
+    python3-wheel \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+RUN echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && \
     locale-gen && \
     update-locale LANG=en_US.UTF-8
 
-ENV LANG=en_US.UTF-8 \
-    LANGUAGE=en_US:en \
-    LC_ALL=en_US.UTF-8
-    
-# === Python packages ===
+# ------------------------------------------------------------------------------
+# === Python packages (updated to avoid conflicts) ===
+# ------------------------------------------------------------------------------
 RUN pip3 install --upgrade pip && \
-    pip3 install deeptools==3.5.6 macs3 yq
+    pip3 install --ignore-installed \
+        numpy==1.26.4 \
+        cython==3.0.11 \
+        deeptools==3.5.5 \
+        macs3 \
+        yq
 
+# ------------------------------------------------------------------------------
+# === IDR patched installation (numpy 2 compatibility fix) ===
+# ------------------------------------------------------------------------------
+WORKDIR /pipeline
 
-# === IDR patched installation (numpy compatibility fix) ===
-WORKDIR /opt
 RUN wget https://github.com/kundajelab/idr/archive/refs/tags/2.0.4.2.tar.gz && \
-    tar -xvf 2.0.4.2.tar.gz && \
-    # Fix deprecated numpy type in the IDR script
+    tar -xvzf 2.0.4.2.tar.gz && \
     sed -i 's/numpy.int/int/g' idr-2.0.4.2/idr/idr.py && \
-    # Install the package from its root (where setup.py lives)
-    pip install ./idr-2.0.4.2 --break-system-packages && \
-    # Clean up build files to keep the image lean
+    pip3 install ./idr-2.0.4.2 && \
     rm -rf idr-2.0.4.2 2.0.4.2.tar.gz
 
-
+# ------------------------------------------------------------------------------
 # === HOMER installation ===
-RUN mkdir -p /opt/homer && \
-    cd /opt/homer && \
+# ------------------------------------------------------------------------------
+RUN mkdir -p /pipeline/homer && \
+    cd /pipeline/homer && \
     wget http://homer.ucsd.edu/homer/configureHomer.pl && \
     perl configureHomer.pl -install && \
-    ln -s /opt/homer/bin/* /usr/local/bin/
+    ln -s /pipeline/homer/bin/* /usr/local/bin/
 
-ENV PATH="/opt/homer/bin:$PATH"
+ENV PATH="/pipeline/homer/bin:$PATH"
 
+# ------------------------------------------------------------------------------
 # === R packages: CRAN + Bioconductor ===
+# ------------------------------------------------------------------------------
 RUN R -e "install.packages(c('dplyr', 'tidyr', 'stringr', 'ggplot2', 'readr', 'data.table', 'httr', 'jsonlite', 'tools', 'gprofiler2'), repos='https://cloud.r-project.org')" && \
     R -e "if (!requireNamespace('BiocManager', quietly=TRUE)) install.packages('BiocManager', repos='https://cloud.r-project.org')" && \
     R -e "BiocManager::install(c('clusterProfiler', 'enrichplot', 'ReactomePA', 'reactome.db', 'biomaRt', 'AnnotationDbi', 'org.Hs.eg.db', 'org.Mm.eg.db'), ask=FALSE, update=FALSE)"
 
-# === Working directory ===
-WORKDIR /data
+# ------------------------------------------------------------------------------
+# === Set working directory ===
+# ------------------------------------------------------------------------------
+WORKDIR /pipeline
 
-# === Copy pipeline tools and assets ===
-COPY tools/ /opt/pipeline2/tools/
-COPY assets/ /opt/pipeline2/assets/
+# ------------------------------------------------------------------------------
+# === Copy pipeline files and tools ===
+# ------------------------------------------------------------------------------
+COPY . /pipeline
+COPY tools/ /pipeline/tools/
+COPY assets/ /pipeline/assets/
 
-# === Set environment variables for pipeline ===
-ENV PATH="/opt/pipeline2/tools:$PATH"
-ENV PIPELINE_TOOLS_DIR="/opt/pipeline2/tools"
-ENV PIPELINE_ASSETS_DIR="/opt/pipeline2/assets"
+# Make scripts executable
+RUN chmod +x /pipeline/tools/* || true
+RUN chmod +x /pipeline/modules/pipeline2/*.sh || true
 
+# ------------------------------------------------------------------------------
 # === Default shell ===
+# ------------------------------------------------------------------------------
 CMD ["/bin/bash"]
-
 
