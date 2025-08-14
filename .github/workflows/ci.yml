@@ -1,0 +1,27 @@
+name: ChIP-Seq CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  test-chipseq:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Build Docker image
+        run: docker build -t chipseq-pipeline -f Dockerfile.pipeline1 .
+
+      - name: Run Pipeline 1
+        run: |
+          docker run --rm -v ${{ github.workspace }}:/data chipseq-pipeline \
+            bash run_pipeline1.sh --reference hg38 --mapping examples/mapping_test.tsv
+
+      - name: Run Pipeline 2
+        run: |
+          docker run --rm -v ${{ github.workspace }}:/data chipseq-pipeline \
+            bash run_pipeline2.sh --reference hg38 --mapping examples/mapping_test.tsv
