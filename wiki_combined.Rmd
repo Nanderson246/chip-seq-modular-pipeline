@@ -304,8 +304,6 @@ If you encounter permission errors or missing dependencies, refer to [Troublesho
 
 ```
 
-
-Let me know if you want to include a section for installing a local Conda environment (`environment.yml`) or a helper `install.sh`.
 ```
 
 
@@ -366,8 +364,6 @@ bash modules/utils/setup_spikein_refs.sh dm6 /path/to/dm6.fa
 -   Organized under `resources/spikein/SPIKE_NAME/`
 
 These scripts **must be run before alignment steps** in the pipeline to ensure all genome/spike references are available and indexed properly.
-
-Let me know if you’d like a Makefile target to wrap these commands for common genomes (e.g., hg38 + dm6).
 
 
 
